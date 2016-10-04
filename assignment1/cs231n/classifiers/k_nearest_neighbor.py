@@ -124,9 +124,6 @@ class KNearestNeighbor(object):
         #########################################################################
         # Let v and w be vectors, then
         # ||v-w||^2 = ||v||^2 + ||w||^2 - 2*dot(v,w)
-
-        dists = np.sum(X*X, axis = 1)
-
         test_square = np.reshape(np.sum(X*X, axis = 1),(-1,1))
         train_square = np.reshape(np.sum(self.X_train*self.X_train, axis = 1),(1,-1))
 
