@@ -54,7 +54,7 @@ def load_tiny_imagenet(path, dtype=np.float32):
     wnids = [x.strip() for x in f]
 
   # Map wnids to integer labels
-  wnid_to_label = {wnid: i for i, wnid in enumerate(wnids)}
+  wnid_to_label = { wnid: i for i, wnid in enumerate(wnids) }
 
   # Use words.txt to get names for each class
   with open(os.path.join(path, 'words.txt'), 'r') as f:
