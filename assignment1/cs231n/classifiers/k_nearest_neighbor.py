@@ -122,7 +122,16 @@ class KNearestNeighbor(object):
         # HINT: Try to formulate the l2 distance using matrix multiplication    #
         #       and two broadcast sums.                                         #
         #########################################################################
-        pass
+        # Let v and w be vectors, then
+        # ||v-w||^2 = ||v||^2 + ||w||^2 - 2*dot(v,w)
+
+        dists = np.sum(X*X, axis = 1)
+
+        test_square = np.reshape(np.sum(X*X, axis = 1),(-1,1))
+        train_square = np.reshape(np.sum(self.X_train*self.X_train, axis = 1),(1,-1))
+
+        dists = test_square + train_square - 2*np.dot(X,np.transpose(self.X_train))
+        dists = np.sqrt(dists)
         #########################################################################
         #                         END OF YOUR CODE                              #
         #########################################################################
@@ -154,8 +163,7 @@ class KNearestNeighbor(object):
             # neighbors. Store these labels in closest_y.                           #
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
-            closest_y = self.y_train[np.argsort(dists[i:], axis=1, kind='quicksort').take(np.arange(0,k))]
-            print  closest_y
+            closest_y = np.argsort(dists[i:], axis=1, kind='quicksort').take(np.arange(0,k))
             #########################################################################
             # TODO:                                                                 #
             # Now that you have found the labels of the k nearest neighbors, you    #
@@ -163,7 +171,15 @@ class KNearestNeighbor(object):
             # Store this label in y_pred[i]. Break ties by choosing the smaller     #
             # label.                                                                #
             #########################################################################
-            pass
+            closest_labels = np.array(self.y_train[closest_y]).tolist() #find the labels of k-rows
+
+            most_common_label = closest_labels[0]  #find most common label
+
+            for label in closest_labels:
+                num = closest_labels.count(label)
+                if num < closest_labels.count(most_common_label):
+                     most_common_label = label
+            y_pred[i] = most_common_label[0]
             #########################################################################
             #                           END OF YOUR CODE                            #
             #########################################################################
