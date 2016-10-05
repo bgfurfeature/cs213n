@@ -33,11 +33,8 @@ class TwoLayerNet(object):
     - hidden_size: The number of neurons H in the hidden layer.
     - output_size: The number of classes C.
     """
-        self.params = {}
-        self.params['W1'] = std * np.random.randn(input_size, hidden_size)
-        self.params['b1'] = np.zeros(hidden_size)
-        self.params['W2'] = std * np.random.randn(hidden_size, output_size)
-        self.params['b2'] = np.zeros(output_size)
+        self.params = {'W1': std * np.random.randn(input_size, hidden_size), 'b1': np.zeros(hidden_size),
+                       'W2': std * np.random.randn(hidden_size, output_size), 'b2': np.zeros(output_size)}
 
     def loss(self, X, y=None, reg=0.0):
         """
@@ -157,7 +154,9 @@ class TwoLayerNet(object):
             # TODO: Create a random minibatch of training data and labels, storing  #
             # them in X_batch and y_batch respectively.                             #
             #########################################################################
-            pass
+            batchMask = np.random.choice(num_train, batch_size)
+            X_batch = X[batchMask]
+            y_batch = y[batchMask]
             #########################################################################
             #                             END OF YOUR CODE                          #
             #########################################################################
@@ -172,7 +171,10 @@ class TwoLayerNet(object):
             # using stochastic gradient descent. You'll need to use the gradients   #
             # stored in the grads dictionary defined above.                         #
             #########################################################################
-            pass
+            self.params['W1'] -= learning_rate * grads['W1']
+            self.params['b1'] -= learning_rate * grads['b1']
+            self.params['W2'] -= learning_rate * grads['W2']
+            self.params['b2'] -= learning_rate * grads['b2']
             #########################################################################
             #                             END OF YOUR CODE                          #
             #########################################################################
@@ -217,7 +219,8 @@ class TwoLayerNet(object):
         ###########################################################################
         # TODO: Implement this function; it should be VERY simple!                #
         ###########################################################################
-        pass
+        losses = self.loss(X, y=None, reg=0.0)
+        y_pred = losses.argmax(axis=-1)
         ###########################################################################
         #                              END OF YOUR CODE                           #
         ###########################################################################
