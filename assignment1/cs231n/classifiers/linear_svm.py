@@ -25,10 +25,10 @@ def svm_loss_naive(W, X, y, reg):
   num_classes = W.shape[1]
   num_train = X.shape[0]
   loss = 0.0
-  count = 0
   for i in xrange(num_train):
-    scores = X[i].dot(W) # x.w.T
+    scores = X[i].dot(W)
     correct_class_score = scores[y[i]]
+    count = 0
     for j in xrange(num_classes):
       if j == y[i]:
         continue
@@ -37,7 +37,7 @@ def svm_loss_naive(W, X, y, reg):
         loss += margin
         count += 1
         dW.T[j] += -0.1 * X[i]
-  dW.T[y[i]] += -0.1 * (- count * X[y[i]])
+    dW.T[y[i]] += -0.1 * (- count * X[y[i]])
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
   loss /= num_train
@@ -55,6 +55,13 @@ def svm_loss_naive(W, X, y, reg):
   #############################################################################
   print "dw"
   print  dW
+
+  # UPDATE W
+
+  W_NEW = reg * W + dW
+
+  print  "w_new"
+  print W_NEW
 
   return loss, dW
 
