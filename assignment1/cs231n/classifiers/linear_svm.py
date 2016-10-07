@@ -93,10 +93,10 @@ def svm_loss_vectorized(W, X, y, reg):
 
     loss += 0.5 * reg * np.sum(W * W)
 
-    coeff_matrix = np.zeros((num_train, num_classes))
-    coeff_matrix[margins > 0] = 1
-    coeff_matrix[range(num_train), list(y)] = 0
-    coeff_matrix[range(num_train), list(y)] = -np.sum(coeff_matrix, axis=1)
+    coeff_matrix = np.zeros((num_train, num_classes))   # loss的导数矩阵初始化
+    coeff_matrix[margins > 0] = 1  # 对>0 的求导为1
+    coeff_matrix[range(num_train), list(y)] = 0  # 对目标类求导为 -1
+    coeff_matrix[range(num_train), list(y)] = -np.sum(coeff_matrix, axis=1)   # 累加sum（分段计算的概念）
 
 
     #############################################################################
