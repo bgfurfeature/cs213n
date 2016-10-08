@@ -65,14 +65,14 @@ dout = np.random.randn(10, 5)   # [10 x 5]
 # print  x
 dx_num = eval_numerical_gradient_array(lambda x: affine_forward(x, w, b)[0], x, dout)
 
-# dw_num = eval_numerical_gradient_array(lambda w: affine_forward(x, w, b)[0], w, dout)
-# db_num = eval_numerical_gradient_array(lambda b: affine_forward(x, w, b)[0], b, dout)
+dw_num = eval_numerical_gradient_array(lambda w: affine_forward(x, w, b)[0], w, dout)
+db_num = eval_numerical_gradient_array(lambda b: affine_forward(x, w, b)[0], b, dout)
 #
-# _, cache = affine_forward(x, w, b)
-# dx, dw, db = affine_backward(dout, cache)
+_, cache = affine_forward(x, w, b)
+dx, dw, db = affine_backward(dout, cache)
 #
 # # The error should be around 1e-10
-# print 'Testing affine_backward function:'
-# print 'dx error: ', rel_error(dx_num, dx)
-# print 'dw error: ', rel_error(dw_num, dw)
-# print 'db error: ', rel_error(db_num, db)
+print 'Testing affine_backward function:'
+print 'dx error: ', rel_error(dx_num, dx)
+print 'dw error: ', rel_error(dw_num, dw)
+print 'db error: ', rel_error(db_num, db)

@@ -34,7 +34,8 @@ def eval_numerical_gradient(f, x, verbose=True, h=0.00001):
     return grad
 
 
-def eval_numerical_gradient_array(f, x, df, h = 1e-5):
+# 数据梯度计算【数组型】
+def eval_numerical_gradient_array(f, x, df, h=1e-5):
     """
   Evaluate a numeric gradient for a function that accepts a numpy
   array and returns a numpy array.
@@ -50,9 +51,9 @@ def eval_numerical_gradient_array(f, x, df, h = 1e-5):
         x[ix] = oldval - h
         neg = f(x).copy()
         x[ix] = oldval
-        print (pos - neg) * df / (2 * h)
-        grad[ix] = np.sum((pos - neg) * df) / (2 * h)   # 更新一行？
-        print grad[ix]
+        # print (pos - neg) * df / (2 * h)  # [10 x 5]
+        grad[ix] = np.sum((pos - neg) * df) / (2 * h)  # 更新一行(每行运算中都会包含对应的x，可以理解为梯度分段计算)
+        # print grad[ix]
         it.iternext()
     return grad
 

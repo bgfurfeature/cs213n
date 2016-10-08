@@ -55,7 +55,9 @@ def affine_backward(dout, cache):
     #############################################################################
     # TODO: Implement the affine backward pass.                                 #
     #############################################################################
-    db = np.sum(dout, axis=0)
+    # print  dout
+    db = np.sum(dout, axis=0)  # 列相加 【1 x 5】
+    # print  db
     x_temp = x.reshape(x.shape[0], -1)
     dw = x_temp.T.dot(dout)
     dx = dout.dot(w.T).reshape(x.shape)
