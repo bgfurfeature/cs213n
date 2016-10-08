@@ -19,7 +19,7 @@ def load_CIFAR10(ROOT):
     """ load all of cifar """
     xs = []
     ys = []
-    for b in range(1, 6):
+    for b in range(1, 2):
         f = os.path.join(ROOT, 'data_batch_%d' % (b,))
         X, Y = load_CIFAR_batch(f)
         xs.append(X)
@@ -52,7 +52,7 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000):
     X_test = X_test[mask]
     y_test = y_test[mask]
 
-    # Normalize the data: subtract the mean image
+    # Normalize the data: subtract the mean image, same mean pls
     mean_image = np.mean(X_train, axis=0)
     X_train -= mean_image
     X_val -= mean_image

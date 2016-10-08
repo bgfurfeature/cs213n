@@ -1,3 +1,4 @@
+# coding=utf-8
 import numpy as np
 from random import randrange
 
@@ -33,24 +34,25 @@ def eval_numerical_gradient(f, x, verbose=True, h=0.00001):
     return grad
 
 
-def eval_numerical_gradient_array(f, x, df, h=1e-5):
+def eval_numerical_gradient_array(f, x, df, h = 1e-5):
     """
   Evaluate a numeric gradient for a function that accepts a numpy
   array and returns a numpy array.
   """
-    grad = np.zeros_like(x)
+    grad = np.zeros_like(x)  # [10 x 6] the same size with x
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         ix = it.multi_index
-
         oldval = x[ix]
+        # print oldval
         x[ix] = oldval + h
         pos = f(x).copy()
         x[ix] = oldval - h
         neg = f(x).copy()
         x[ix] = oldval
-
-        grad[ix] = np.sum((pos - neg) * df) / (2 * h)
+        print (pos - neg) * df / (2 * h)
+        grad[ix] = np.sum((pos - neg) * df) / (2 * h)   # 更新一行？
+        print grad[ix]
         it.iternext()
     return grad
 
