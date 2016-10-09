@@ -40,8 +40,12 @@ y_val = data['y_val']
 
 lr = 3.113669e-04  # [10] #[2.379994e-04] # 10**np.random.uniform(-7,1,20)
 ws = 2.461858e-02
+
+# initial model calculate process
 model = FullyConnectedNet([100, 100, 100, 100],
                           weight_scale=ws, dtype=np.float64, use_batchnorm=False, reg=1e-2)
+
+# structure another process for track the trainning path
 solver = Solver(model, data,
                 print_every=100, num_epochs=10, batch_size=25,
                 update_rule='adam',
@@ -51,7 +55,7 @@ solver = Solver(model, data,
                 lr_decay=0.9,
                 verbose=True
                 )
-
+# truely training started from here
 solver.train()
 
 best_model = model
