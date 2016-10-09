@@ -1,5 +1,6 @@
 import numpy as np
 
+# most complete file of all process
 
 def affine_forward(x, w, b):
     """
@@ -56,7 +57,7 @@ def affine_backward(dout, cache):
     # TODO: Implement the affine backward pass.                                 #
     #############################################################################
     # print  dout
-    db = np.sum(dout, axis=0)  # 列相加 【1 x 5】
+    db = np.sum(dout, axis=0)  # column add [1 x 5]
     # print  db
     x_temp = x.reshape(x.shape[0], -1)
     dw = x_temp.T.dot(dout)
@@ -84,6 +85,7 @@ def relu_forward(x):
     #############################################################################
     out = np.copy(x)
     out[out < 0] = 0
+    # print  out
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -107,7 +109,7 @@ def relu_backward(dout, cache):
     # TODO: Implement the ReLU backward pass.                                   #
     #############################################################################
     dx = np.copy(dout)
-    dx[x < 0] = 0
+    dx[x < 0] = 0  # x value < 0 max(0,x) gradient is 0 otherwise is 1, result is dout * (df/dx)
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -195,7 +197,7 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # and shift the normalized data using gamma and beta. Store the result in   #
         # the out variable.                                                         #
         #############################################################################
-        x_normalized = (x - running_mean)/np.sqrt(running_var +eps)
+        x_normalized = (x - running_mean) / np.sqrt(running_var + eps)
         out = gamma * x_normalized + beta
         #############################################################################
         #                             END OF YOUR CODE                              #
@@ -235,11 +237,13 @@ def batchnorm_backward(dout, cache):
     (x, sample_mean, sample_var, x_normalized, beta, gamma, eps) = cache
     N = x.shape[0]
     dbeta = np.sum(dout, axis=0)
-    dgamma = np.sum(x_normalized*dout, axis = 0)
+    dgamma = np.sum(x_normalized * dout, axis=0)
     dx_normalized = gamma * dout
-    dsample_var = np.sum(-1.0/2 * dx_normalized *(x-sample_mean)/(sample_var+eps)**(3.0/2), axis =0)
-    dsample_mean = np.sum(-1/np.sqrt(sample_var+eps) * dx_normalized, axis = 0) + 1.0/N * dsample_var * np.sum(- 2 * (x-sample_mean), axis = 0)
-    dx = 1/np.sqrt(sample_var+eps) * dx_normalized + dsample_var * 2.0/ N * (x-sample_mean) + 1.0/N * dsample_mean
+    dsample_var = np.sum(-1.0 / 2 * dx_normalized * (x - sample_mean) / (sample_var + eps) ** (3.0 / 2), axis=0)
+    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized, axis=0) + 1.0 / N * dsample_var * np.sum(
+        - 2 * (x - sample_mean), axis=0)
+    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (
+    x - sample_mean) + 1.0 / N * dsample_mean
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -272,11 +276,13 @@ def batchnorm_backward_alt(dout, cache):
     (x, sample_mean, sample_var, x_normalized, beta, gamma, eps) = cache
     N = x.shape[0]
     dbeta = np.sum(dout, axis=0)
-    dgamma = np.sum(x_normalized*dout, axis = 0)
-    dx_normalized = gamma* dout
-    dsample_var = np.sum(-1.0/2*dx_normalized*x_normalized/(sample_var+eps), axis =0)
-    dsample_mean = np.sum(-1/np.sqrt(sample_var+eps)* dx_normalized, axis = 0) # drop the second term which simplfies to zero
-    dx = 1/np.sqrt(sample_var+eps)*dx_normalized + dsample_var*2.0/N*(x-sample_mean) + 1.0/N*dsample_mean
+    dgamma = np.sum(x_normalized * dout, axis=0)
+    dx_normalized = gamma * dout
+    dsample_var = np.sum(-1.0 / 2 * dx_normalized * x_normalized / (sample_var + eps), axis=0)
+    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized,
+                          axis=0)  # drop the second term which simplfies to zero
+    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (
+    x - sample_mean) + 1.0 / N * dsample_mean
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -319,9 +325,9 @@ def dropout_forward(x, dropout_param):
         # Slide: p is the probablity of a neuron to be kept
         # Here: p is the probability of a neuron to be drop
 
-        [N,D] = x.shape
-        mask = (np.random.rand(N,D) < (1-p))/(1-p)
-        out = x*mask
+        [N, D] = x.shape
+        mask = (np.random.rand(N, D) < (1 - p)) / (1 - p)
+        out = x * mask
         ###########################################################################
         #                            END OF YOUR CODE                             #
         ###########################################################################
@@ -356,7 +362,7 @@ def dropout_backward(dout, cache):
         ###########################################################################
         # TODO: Implement the training phase backward pass for inverted dropout.  #
         ###########################################################################
-        dx = mask*dout
+        dx = mask * dout
         ###########################################################################
         #                            END OF YOUR CODE                             #
         ###########################################################################
@@ -558,15 +564,24 @@ def svm_loss(x, y):
   - dx: Gradient of the loss with respect to x
   """
     N = x.shape[0]
-    correct_class_scores = x[np.arange(N), y]
-    margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0)
-    margins[np.arange(N), y] = 0
-    loss = np.sum(margins) / N
-    num_pos = np.sum(margins > 0, axis=1)
+    # print x
+    # print y
+    correct_class_scores = x[np.arange(N), y]  # [ 1 x N]
+    # print correct_class_scores
+    margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0)  # follow rows calculate, one by one reflect
+    margins[np.arange(N), y] = 0  # the right position in y of each x set 0, because of no margin
+    # print margins
+    loss = np.sum(margins) / N  # each x's loss sum and divide total N, needed to calculate total loss value
+    # print loss
+    num_pos = np.sum(margins > 0, axis=1)     # [1 x N]
+    # print num_pos
     dx = np.zeros_like(x)
     dx[margins > 0] = 1
-    dx[np.arange(N), y] -= num_pos
+    # print dx
+    dx[np.arange(N), y] -= num_pos  # duplicate of each dx[i,j]
+    # print dx
     dx /= N
+    # print dx
     return loss, dx
 
 
