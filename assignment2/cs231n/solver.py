@@ -125,7 +125,7 @@ class Solver(object):
         # name with the actual function
         if not hasattr(optim, self.update_rule):
             raise ValueError('Invalid update_rule "%s"' % self.update_rule)
-        self.update_rule = getattr(optim, self.update_rule)
+        self.update_rule = getattr(optim, self.update_rule)  # get update_rule's function instance
 
         self._reset()
 
@@ -145,7 +145,7 @@ class Solver(object):
         # Make a deep copy of the optim_config for each parameter
         self.optim_configs = {}
         for p in self.model.params:
-            d = {k: v for k, v in self.optim_config.iteritems()}
+            d = { k: v for k, v in self.optim_config.iteritems()}
             self.optim_configs[p] = d
 
     def _step(self):
@@ -191,7 +191,7 @@ class Solver(object):
         # Maybe subsample the data
         N = X.shape[0]
         if num_samples is not None and N > num_samples:
-            mask = np.random.choice(N, num_samples)
+            mask = np.random.choice(N, num_samples)  # random select num_samples of x for check acc
             N = num_samples
             X = X[mask]
             y = y[mask]
@@ -206,7 +206,7 @@ class Solver(object):
             end = (i + 1) * batch_size
             scores = self.model.loss(X[start:end])
             y_pred.append(np.argmax(scores, axis=1))
-        y_pred = np.hstack(y_pred)
+        y_pred = np.hstack(y_pred)  # transform to nparry
         acc = np.mean(y_pred == y)
 
         return acc
@@ -258,4 +258,4 @@ class Solver(object):
                         self.best_params[k] = v.copy()
 
         # At the end of training swap the best params into the model
-        self.model.params = self.best_params
+        self.model.params = self.best_params  # this param will be used in predict other data

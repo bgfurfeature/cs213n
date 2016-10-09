@@ -17,15 +17,16 @@ def load_CIFAR10(ROOT):
     """ load all of cifar """
     xs = []
     ys = []
-    for b in range(1, 2):
-        f = os.path.join(ROOT, 'data_batch_%d' % (b,))
-        X, Y = load_CIFAR_batch(f)
+    for b in range(1, 6):
+        # f = os.path.join(ROOT, 'data_batch_%d' % (b,))
+        X, Y = load_CIFAR_batch(ROOT + "/" + 'data_batch_%d' % (b,))
         xs.append(X)
         ys.append(Y)
     Xtr = np.concatenate(xs)
     Ytr = np.concatenate(ys)
     del X, Y
-    Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
+    # Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
+    Xte, Yte = load_CIFAR_batch(ROOT + '/test_batch')
     return Xtr, Ytr, Xte, Yte
 
 
@@ -36,11 +37,13 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000):
     condensed to a single function.
     """
     # Load the raw CIFAR-10 data
-    cifar10_dir = 'cs231n/datasets/cifar-10-batches-py'
+    cifar10_dir = 'E:/github/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py'
     X_train, y_train, X_test, y_test = load_CIFAR10(cifar10_dir)
 
     # Subsample the data
     mask = range(num_training, num_training + num_validation)
+    # print  mask
+    # print X_train.shape
     X_val = X_train[mask]
     y_val = y_train[mask]
     mask = range(num_training)
