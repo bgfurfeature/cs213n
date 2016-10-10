@@ -14,7 +14,7 @@ plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
 
-
+ #############################################################################
 # for auto-reloading external modules
 # see http://stackoverflow.com/questions/1907993/autoreload-of-modules-in-ipython
 
@@ -22,14 +22,14 @@ def rel_error(x, y):
     """ returns relative error """
     return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
 
-
+ #############################################################################
 ##  Load the (preprocessed) CIFAR10 data.
 
 # data = get_CIFAR10_data()
 # for k, v in data.iteritems():
 #     print '%s: ' % k, v.shape
 
-
+ #############################################################################
 # Affine layer: foward
 # Test the affine_forward function
 
@@ -56,7 +56,7 @@ def rel_error(x, y):
 # Compare your output with ours. The error should be around 1e-9.
 # print 'Testing affine_forward function:'
 # print 'difference: ', rel_error(out, correct_out)
-
+ #############################################################################
 # Affine layer: backward
 # Test the affine_backward function
 
@@ -81,7 +81,7 @@ def rel_error(x, y):
 # print 'dx error: ', rel_error(dx_num, dx)
 # print 'dw error: ', rel_error(dw_num, dw)
 # print 'db error: ', rel_error(db_num, db)
-
+ #############################################################################
 # ReLU layer: forward
 # Test the relu_forward function
 
@@ -95,7 +95,7 @@ def rel_error(x, y):
 # # Compare your output with ours. The error should be around 1e-8
 # print 'Testing relu_forward function:'
 # print 'difference: ', rel_error(out, correct_out)
-
+ #############################################################################
 # ReLU layer: backward
 
 # x = np.random.randn(10, 10)
@@ -109,7 +109,7 @@ def rel_error(x, y):
 # # The error should be around 1e-12
 # print 'Testing relu_backward function:'
 # print 'dx error: ', rel_error(dx_num, dx)
-
+ #############################################################################
 # "Sandwich" layers
 
 # from cs231n.layer_utils import affine_relu_forward, affine_relu_backward
@@ -129,7 +129,7 @@ def rel_error(x, y):
 # print 'dx error: ', rel_error(dx_num, dx)
 # print 'dw error: ', rel_error(dw_num, dw)
 # print 'db error: ', rel_error(db_num, db)
-
+ #############################################################################
 # Loss layers: Softmax and SVM
 
 # num_classes, num_inputs = 10, 50
@@ -151,7 +151,7 @@ def rel_error(x, y):
 # print '\nTesting softmax_loss:'
 # print 'loss: ', loss
 # print 'dx error: ', rel_error(dx_num, dx)
-
+ #############################################################################
 # Two-layer network
 
 # N, D, H, C = 3, 5, 50, 7  # H: hidden layer neuron number, C: num classes, D: dimension of features, N: number of test unit
@@ -205,7 +205,7 @@ def rel_error(x, y):
 #     f = lambda _: model.loss(X, y)[0]
 #     grad_num = eval_numerical_gradient(f, model.params[name], verbose=False)
 #    print '%s relative error: %.2e' % (name, rel_error(grad_num, grads[name]))
-
+ #############################################################################
 # Solver: the full process of TwoLayerNet
 
 model = TwoLayerNet()
@@ -229,7 +229,7 @@ solver = None
 #     f = lambda _: model.loss(X, y)[0]
 #     grad_num = eval_numerical_gradient(f, model.params[name], verbose=False, h=1e-5)
 #     print '%s relative error: %.2e' % (name, rel_error(grad_num, grads[name]))
-
+ #############################################################################
 # TODO: Use a three-layer Net to overfit 50 training examples.
 
 # num_train = 50
@@ -252,7 +252,7 @@ solver = None
 #                 }
 #          )
 # solver.train()
-
+ #############################################################################
 # TODO: Use a five-layer Net to overfit 50 training examples.
 
 # num_train = 50
@@ -275,7 +275,7 @@ solver = None
 #                 }
 #          )
 # solver.train()
-
+ #############################################################################
 # SGD+Momentum
 
 # from cs231n.optim import sgd_momentum
@@ -302,7 +302,7 @@ solver = None
 # print 'next_w error: ', rel_error(next_w, expected_next_w)
 # print 'velocity error: ', rel_error(expected_velocity, config['velocity'])
 
-
+ #############################################################################
 # run SGD and SGD + Momentum compared with both
 
 # num_train = 4000
@@ -329,9 +329,8 @@ solver = None
 #   solvers[update_rule] = solver
 #   solver.train()
 #   print
-
+ #############################################################################
 # RMSProp and Adam
-
 # Test RMSProp implementation; you should see errors less than 1e-7
 
 # from cs231n.optim import rmsprop
@@ -357,7 +356,7 @@ solver = None
 #
 # print 'next_w error: ', rel_error(expected_next_w, next_w)
 # print 'cache error: ', rel_error(expected_cache, config['cache'])
-
+ #############################################################################
 # Adam
 # Test Adam implementation; you should see errors around 1e-7 or less
 
@@ -391,7 +390,7 @@ solver = None
 # print 'next_w error: ', rel_error(expected_next_w, next_w)
 # print 'v error: ', rel_error(expected_v, config['v'])
 # print 'm error: ', rel_error(expected_m, config['m'])
-
+ #############################################################################
 # Once you have debugged your RMSProp and Adam implementations, run the following to train a pair of deep networks using these new update rules:
 
 # small_data = {
@@ -415,7 +414,7 @@ solver = None
 #   solvers[update_rule] = solver
 #   solver.train()
 #   print
-
+ #############################################################################
 # Train a good model!
 # best_model = None
 #
@@ -442,7 +441,7 @@ solver = None
 # solver.train()
 #
 # best_model = model
-
+ #############################################################################
 
 # Test you model
 
