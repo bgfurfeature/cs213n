@@ -153,13 +153,14 @@ def batchnorm_forward(x, gamma, beta, bn_param):
   Returns a tuple of:
   - out: of shape (N, D)
   - cache: A tuple of values needed in the backward pass
+    :param bn_param:
   """
     mode = bn_param['mode']
     eps = bn_param.get('eps', 1e-5)
     momentum = bn_param.get('momentum', 0.9)
 
     N, D = x.shape
-    running_mean = bn_param.get('running_mean', np.zeros(D, dtype=x.dtype))
+    running_mean = bn_param.get('running_mean', np.zeros(D, dtype=x.dtype))  # [1 x D]
     running_var = bn_param.get('running_var', np.zeros(D, dtype=x.dtype))
 
     out, cache = None, None
@@ -177,7 +178,7 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # the momentum variable to update the running mean and running variance,    #
         # storing your result in the running_mean and running_var variables.        #
         #############################################################################
-        sample_mean = np.mean(x, axis=0)
+        sample_mean = np.mean(x, axis=0)  # total data of each feature's mean. Dimension same to x. [1 x D]
         sample_var = np.var(x, axis=0)
 
         x_normalized = (x - sample_mean) / np.sqrt(sample_var + eps)
@@ -228,6 +229,8 @@ def batchnorm_backward(dout, cache):
   - dx: Gradient with respect to inputs x, of shape (N, D)
   - dgamma: Gradient with respect to scale parameter gamma, of shape (D,)
   - dbeta: Gradient with respect to shift parameter beta, of shape (D,)
+    :param dout:
+    :param cache:
   """
     dx, dgamma, dbeta = None, None, None
     #############################################################################
@@ -235,15 +238,18 @@ def batchnorm_backward(dout, cache):
     # results in the dx, dgamma, and dbeta variables.                           #
     #############################################################################
     (x, sample_mean, sample_var, x_normalized, beta, gamma, eps) = cache
+    # print  "cache"
+    # print cache
     N = x.shape[0]
-    dbeta = np.sum(dout, axis=0)
+    dbeta = np.sum(dout, axis=0)  # gradient on diff stage have multiple outgoing branches; make sure to sum gradients across these branches in the backward pass the first element should sum by column
     dgamma = np.sum(x_normalized * dout, axis=0)
     dx_normalized = gamma * dout
     dsample_var = np.sum(-1.0 / 2 * dx_normalized * (x - sample_mean) / (sample_var + eps) ** (3.0 / 2), axis=0)
-    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized, axis=0) + 1.0 / N * dsample_var * np.sum(
-        - 2 * (x - sample_mean), axis=0)
-    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (
-    x - sample_mean) + 1.0 / N * dsample_mean
+
+    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized, axis=0)
+    dsample_mean += 1.0 / N * dsample_var * np.sum( - 2 * (x - sample_mean), axis=0)  # var = 1.0 / n * power(x - mean, 2)
+
+    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * ( x - sample_mean) + 1.0 / N * dsample_mean
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -279,10 +285,9 @@ def batchnorm_backward_alt(dout, cache):
     dgamma = np.sum(x_normalized * dout, axis=0)
     dx_normalized = gamma * dout
     dsample_var = np.sum(-1.0 / 2 * dx_normalized * x_normalized / (sample_var + eps), axis=0)
-    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized,
-                          axis=0)  # drop the second term which simplfies to zero
-    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (
-    x - sample_mean) + 1.0 / N * dsample_mean
+    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized,axis=0)  # drop the second term which simplfies to zero
+    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (x - sample_mean) + 1.0 / N * dsample_mean
+
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -326,8 +331,8 @@ def dropout_forward(x, dropout_param):
         # Here: p is the probability of a neuron to be drop
 
         [N, D] = x.shape
-        mask = (np.random.rand(N, D) < (1 - p)) / (1 - p)
-        out = x * mask
+        mask = (np.random.rand(N, D) < ( 1 -  p)) / (1 -  p)
+        out = x * mask  # multi one by one not dot with matrix
         ###########################################################################
         #                            END OF YOUR CODE                             #
         ###########################################################################

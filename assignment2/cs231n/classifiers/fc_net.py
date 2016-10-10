@@ -102,8 +102,7 @@ class TwoLayerNet(object):
         ############################################################################
         loss, dscores = softmax_loss(scores, y)
 
-        loss += 0.5 * self.reg * (
-            np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']))
+        loss += 0.5 * self.reg * (np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']))
 
         affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
         grads['W2'] = affine2_dw + self.reg * self.params['W2']
@@ -216,7 +215,7 @@ class FullyConnectedNet(object):
             self.params[k] = v.astype(dtype)
 
     # batch normalization forward
-    def affine_bn_relu_forward(x, w, b, gamma, beta, bn_param):
+    def affine_bn_relu_forward(self, x, w, b, gamma, beta, bn_param):
         """
       Convenience layer that perorms an affine transform followed by a ReLU
       Inputs:
@@ -225,6 +224,7 @@ class FullyConnectedNet(object):
       Returns a tuple of:
       - out: Output from the ReLU
       - cache: Object to give to the backward pass
+        :param bn_param:
       """
         affine_out, fc_cache = affine_forward(x, w, b)
         bn_out, bn_cache = batchnorm_forward(affine_out, gamma, beta, bn_param)
@@ -233,7 +233,7 @@ class FullyConnectedNet(object):
         return relu_out, cache
 
     # batch normalization backward
-    def affine_bn_relu_backward(dout, cache):
+    def affine_bn_relu_backward(self, dout, cache):
         """
       Backward pass for the affine-relu convenience layer
       """
@@ -288,11 +288,7 @@ class FullyConnectedNet(object):
             else:
                 key_gamma = 'gamma' + str(i)
                 key_beta = 'beta' + str(i)
-                current_input, affine_bn_relu_cache[i] = self.affine_bn_relu_forward(current_input, self.params[keyW],
-                                                                                     self.params[keyb],
-                                                                                     self.params[key_gamma],
-                                                                                     self.params[key_beta],
-                                                                                     self.bn_params[i - 1])
+                current_input, affine_bn_relu_cache[i] = self.affine_bn_relu_forward(current_input, self.params[keyW], self.params[keyb], self.params[key_gamma], self.params[key_beta], self.bn_params[i-1])
 
             if self.use_dropout:
                 current_input, dropout_cache[i] = dropout_forward(current_input, self.dropout_param)
@@ -331,8 +327,7 @@ class FullyConnectedNet(object):
         affine_dx, affine_dw, affine_db = affine_backward(dscores, affine_cache)
         grads['W' + str(self.num_layers)] = affine_dw + self.reg * self.params['W' + str(self.num_layers)]
         grads['b' + str(self.num_layers)] = affine_db
-        loss += 0.5 * self.reg * (
-        np.sum(self.params['W' + str(self.num_layers)] * self.params['W' + str(self.num_layers)]))
+        loss += 0.5 * self.reg * (np.sum(self.params['W' + str(self.num_layers)] * self.params['W' + str(self.num_layers)]))
 
         for i in range(self.num_layers - 1, 0, -1):
             if self.use_dropout:
@@ -342,7 +337,7 @@ class FullyConnectedNet(object):
                 affine_dx, affine_dw, affine_db = affine_relu_backward(affine_dx, affine_relu_cache[i])
 
             else:
-                affine_dx, affine_dw, affine_db, dgamma, dbeta = self.affine_bn_relu_backward(affine_dx,affine_bn_relu_cache[i])
+                affine_dx, affine_dw, affine_db, dgamma, dbeta = self.affine_bn_relu_backward(affine_dx, affine_bn_relu_cache[i])
                 grads['beta' + str(i)] = dbeta
                 grads['gamma' + str(i)] = dgamma
 
