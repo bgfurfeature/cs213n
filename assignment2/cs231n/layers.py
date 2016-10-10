@@ -386,7 +386,7 @@ def conv_forward_naive(x, w, b, conv_param):
     """
   A naive implementation of the forward pass for a convolutional layer.
 
-  The input consists of N data points, each with C channels, height H and width
+  The input consists of N data points, each with C channels(can be seen as depth in each pixel(RGB)), height H and width
   W. We convolve each input with F different filters, where each filter spans
   all C channels and has height HH and width HH.
 
