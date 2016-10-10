@@ -29,7 +29,7 @@ def rel_error(x, y):
 # for k, v in data.iteritems():
 #     print '%s: ' % k, v.shape
 
- #############################################################################
+#############################################################################
 # Affine layer: foward
 # Test the affine_forward function
 
@@ -56,7 +56,7 @@ def rel_error(x, y):
 # Compare your output with ours. The error should be around 1e-9.
 # print 'Testing affine_forward function:'
 # print 'difference: ', rel_error(out, correct_out)
- #############################################################################
+#############################################################################
 # Affine layer: backward
 # Test the affine_backward function
 
@@ -81,7 +81,7 @@ def rel_error(x, y):
 # print 'dx error: ', rel_error(dx_num, dx)
 # print 'dw error: ', rel_error(dw_num, dw)
 # print 'db error: ', rel_error(db_num, db)
- #############################################################################
+#############################################################################
 # ReLU layer: forward
 # Test the relu_forward function
 
@@ -95,7 +95,7 @@ def rel_error(x, y):
 # # Compare your output with ours. The error should be around 1e-8
 # print 'Testing relu_forward function:'
 # print 'difference: ', rel_error(out, correct_out)
- #############################################################################
+#############################################################################
 # ReLU layer: backward
 
 # x = np.random.randn(10, 10)
@@ -109,7 +109,7 @@ def rel_error(x, y):
 # # The error should be around 1e-12
 # print 'Testing relu_backward function:'
 # print 'dx error: ', rel_error(dx_num, dx)
- #############################################################################
+#############################################################################
 # "Sandwich" layers
 
 # from cs231n.layer_utils import affine_relu_forward, affine_relu_backward
@@ -129,7 +129,7 @@ def rel_error(x, y):
 # print 'dx error: ', rel_error(dx_num, dx)
 # print 'dw error: ', rel_error(dw_num, dw)
 # print 'db error: ', rel_error(db_num, db)
- #############################################################################
+#############################################################################
 # Loss layers: Softmax and SVM
 
 # num_classes, num_inputs = 10, 50
@@ -151,7 +151,7 @@ def rel_error(x, y):
 # print '\nTesting softmax_loss:'
 # print 'loss: ', loss
 # print 'dx error: ', rel_error(dx_num, dx)
- #############################################################################
+#############################################################################
 # Two-layer network
 
 # N, D, H, C = 3, 5, 50, 7  # H: hidden layer neuron number, C: num classes, D: dimension of features, N: number of test unit
@@ -205,7 +205,7 @@ def rel_error(x, y):
 #     f = lambda _: model.loss(X, y)[0]
 #     grad_num = eval_numerical_gradient(f, model.params[name], verbose=False)
 #    print '%s relative error: %.2e' % (name, rel_error(grad_num, grads[name]))
- #############################################################################
+#############################################################################
 # Solver: the full process of TwoLayerNet
 
 model = TwoLayerNet()

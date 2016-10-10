@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # most complete file of all process
 
 def affine_forward(x, w, b):
@@ -241,15 +242,18 @@ def batchnorm_backward(dout, cache):
     # print  "cache"
     # print cache
     N = x.shape[0]
-    dbeta = np.sum(dout, axis=0)  # gradient on diff stage have multiple outgoing branches; make sure to sum gradients across these branches in the backward pass the first element should sum by column
+    dbeta = np.sum(dout,
+                   axis=0)  # gradient on diff stage have multiple outgoing branches; make sure to sum gradients across these branches in the backward pass the first element should sum by column
     dgamma = np.sum(x_normalized * dout, axis=0)
     dx_normalized = gamma * dout
     dsample_var = np.sum(-1.0 / 2 * dx_normalized * (x - sample_mean) / (sample_var + eps) ** (3.0 / 2), axis=0)
 
     dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized, axis=0)
-    dsample_mean += 1.0 / N * dsample_var * np.sum( - 2 * (x - sample_mean), axis=0)  # var = 1.0 / n * power(x - mean, 2)
+    dsample_mean += 1.0 / N * dsample_var * np.sum(- 2 * (x - sample_mean),
+                                                   axis=0)  # var = 1.0 / n * power(x - mean, 2)
 
-    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * ( x - sample_mean) + 1.0 / N * dsample_mean
+    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (
+        x - sample_mean) + 1.0 / N * dsample_mean
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -285,8 +289,10 @@ def batchnorm_backward_alt(dout, cache):
     dgamma = np.sum(x_normalized * dout, axis=0)
     dx_normalized = gamma * dout
     dsample_var = np.sum(-1.0 / 2 * dx_normalized * x_normalized / (sample_var + eps), axis=0)
-    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized,axis=0)  # drop the second term which simplfies to zero
-    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (x - sample_mean) + 1.0 / N * dsample_mean
+    dsample_mean = np.sum(-1 / np.sqrt(sample_var + eps) * dx_normalized,
+                          axis=0)  # drop the second term which simplfies to zero
+    dx = 1 / np.sqrt(sample_var + eps) * dx_normalized + dsample_var * 2.0 / N * (
+        x - sample_mean) + 1.0 / N * dsample_mean
 
     #############################################################################
     #                             END OF YOUR CODE                              #
@@ -331,7 +337,7 @@ def dropout_forward(x, dropout_param):
         # Here: p is the probability of a neuron to be drop
 
         [N, D] = x.shape
-        mask = (np.random.rand(N, D) < ( 1 -  p)) / (1 -  p)
+        mask = (np.random.rand(N, D) < (1 - p)) / (1 - p)
         out = x * mask  # multi one by one not dot with matrix
         ###########################################################################
         #                            END OF YOUR CODE                             #
@@ -404,7 +410,30 @@ def conv_forward_naive(x, w, b, conv_param):
     # TODO: Implement the convolutional forward pass.                           #
     # Hint: you can use the function np.pad for padding.                        #
     #############################################################################
-    pass
+    N, C, H, W = x.shape
+    F, _, HH, WW = w.shape
+    stride = conv_param['stride']
+    pad = conv_param['pad']
+
+    H_out = 1 + (H + 2 * pad - HH) / stride
+    W_out = 1 + (W + 2 * pad - WW) / stride
+    out = np.zeros((N, F, H_out, W_out))
+
+    # Pad the input
+    x_pad = np.zeros((N, C, H + 2 * pad, W + 2 * pad))
+    for n in range(N):
+        for c in range(C):
+            x_pad[n, c] = np.pad(x[n, c], (1, 1), 'constant', constant_values=(0, 0))
+
+    for n in range(N):
+        for i in range(H_out):
+            for j in range(W_out):
+                for f in range(F):
+                    current_x_matrix = x_pad[n, :, i * stride: i * stride + HH, j * stride:j * stride + WW]
+                    current_filter = w[f]
+                    out[n, f, i, j] = np.sum(current_x_matrix * current_filter)  # window reflect for sum
+                out[n, :, i, j] = out[n, :, i, j] + b
+
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -429,7 +458,36 @@ def conv_backward_naive(dout, cache):
     #############################################################################
     # TODO: Implement the convolutional backward pass.                          #
     #############################################################################
-    pass
+    x, w, b, conv_param = cache
+    stride = conv_param['stride']
+    pad = conv_param['pad']
+    N, C, H, W = x.shape
+    F, _, HH, WW = w.shape
+    _, _, H_out, W_out = dout.shape
+
+    x_pad = np.zeros((N, C, H + 2 * pad, W + 2 * pad))
+    for n in range(N):
+        for c in range(C):
+            x_pad[n, c] = np.pad(x[n, c], (1, 1), 'constant', constant_values=(0, 0))
+
+    db = np.zeros((F))
+    for n in range(N):
+        for i in range(H_out):
+            for j in range(W_out):
+                db += dout[n, :, i, j]
+
+    dw = np.zeros(w.shape)
+    dx_pad = np.zeros(x_pad.shape)
+
+    for n in range(N):
+        for f in range(F):
+            for i in range(H_out):
+                for j in range(W_out):
+                    current_x_matrix = x_pad[n, :, i * stride: i * stride + HH, j * stride:j * stride + WW]
+                    dw[f] = dw[f] + dout[n, f, i, j] * current_x_matrix
+                    dx_pad[n, :, i * stride: i * stride + HH, j * stride:j * stride + WW] += w[f] * dout[n, f, i, j]
+
+    dx = dx_pad[:, :, 1:H + 1, 1:W + 1]
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -578,7 +636,7 @@ def svm_loss(x, y):
     # print margins
     loss = np.sum(margins) / N  # each x's loss sum and divide total N, needed to calculate total loss value
     # print loss
-    num_pos = np.sum(margins > 0, axis=1)     # [1 x N]
+    num_pos = np.sum(margins > 0, axis=1)  # [1 x N]
     # print num_pos
     dx = np.zeros_like(x)
     dx[margins > 0] = 1
