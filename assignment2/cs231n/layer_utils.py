@@ -60,6 +60,14 @@ def conv_relu_backward(dout, cache):
   dx, dw, db = conv_backward_fast(da, conv_cache)
   return dx, dw, db
 
+def conv_relu_backward_naive(dout, cache):
+  """
+  Backward pass for the conv-relu convenience layer.
+  """
+  conv_cache, relu_cache = cache
+  da = relu_backward(dout, relu_cache)
+  dx, dw, db = conv_backward_naive(da, conv_cache)
+  return dx, dw, db
 
 def conv_relu_pool_forward(x, w, b, conv_param, pool_param):
   """
@@ -89,5 +97,17 @@ def conv_relu_pool_backward(dout, cache):
   ds = max_pool_backward_fast(dout, pool_cache)
   da = relu_backward(ds, relu_cache)
   dx, dw, db = conv_backward_fast(da, conv_cache)
+  return dx, dw, db
+
+
+
+def conv_relu_pool_backward_naive(dout, cache):
+  """
+  Backward pass for the conv-relu-pool convenience layer
+  """
+  conv_cache, relu_cache, pool_cache = cache
+  ds = max_pool_backward_fast(dout, pool_cache)
+  da = relu_backward(ds, relu_cache)
+  dx, dw, db = conv_backward_naive(da, conv_cache)
   return dx, dw, db
 

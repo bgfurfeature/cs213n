@@ -5,7 +5,7 @@ try:
     from cs231n.im2col_cython import col2im_6d_cython
 except ImportError:
     print 'run the following from the cs231n directory and try again:'
-    print 'python setup.py build_ext --inplace'
+    print 'python setup.py build_ext --inplace'  # Unable to find vcvarsall.bat
     print 'You may also need to restart your iPython kernel'
 
 from cs231n.im2col import *
@@ -80,7 +80,7 @@ def conv_forward_strides(x, w, b, conv_param):
     # comparison we won't either
     out = np.ascontiguousarray(out)
 
-    cache = (x, w, b, conv_param, x_cols)
+    cache = (x, w, b, conv_param, x_cols)  # conv_forward_naive() return 4 parameters, notice this difference
     return out, cache
 
 
@@ -99,7 +99,7 @@ def conv_backward_strides(dout, cache):
 
     dx_cols = w.reshape(F, -1).T.dot(dout_reshaped)
     dx_cols.shape = (C, HH, WW, N, out_h, out_w)
-    dx = col2im_6d_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)
+    dx = col2im_6d_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)   # error: iPython kernel
 
     return dx, dw, db
 
@@ -240,7 +240,7 @@ def max_pool_forward_im2col(x, pool_param):
     out_width = (W - pool_width) / stride + 1
 
     x_split = x.reshape(N * C, 1, H, W)
-    x_cols = im2col(x_split, pool_height, pool_width, padding=0, stride=stride)
+    x_cols = im2col_indices(x_split, pool_height, pool_width, padding=0, stride=stride)
     x_cols_argmax = np.argmax(x_cols, axis=0)
     x_cols_max = x_cols[x_cols_argmax, np.arange(x_cols.shape[1])]
     out = x_cols_max.reshape(out_height, out_width, N, C).transpose(2, 3, 0, 1)

@@ -1,18 +1,43 @@
+# coding=utf-8
 import numpy as np
 from cs231n.layers import *
 from cs231n.fast_layers import *
 from cs231n.layer_utils import *
 
+"""
+Things you should try:
+    Filter size: Above we used 7x7; this makes pretty pictures but smaller filters may be more efficient
+    Number of filters: Above we used 32 filters. Do more or fewer do better?
+    Batch normalization: Try adding spatial batch normalization after convolution layers and vanilla batch normalization aafter affine layers. Do your networks train faster?
+    Network architecture: The network above has two layers of trainable parameters. Can you do better with a deeper network? You can implement alternative architectures in the file cs231n/classifiers/convnet.py. Some good architectures to try include:
+        [conv-relu-pool]xN - conv - relu - [affine]xM - [softmax or SVM]
+        [conv-relu-pool]XN - [affine]XM - [softmax or SVM]
+        [conv-relu-conv-relu-pool]xN - [affine]xM - [softmax or SVM]
 
-# three layer
-# [conv-relu-pool]x1 - [affine-relu] - affine - [softmax]
+Tips for training
 
-class ThreeLayerConvNet(object):
+For each network architecture that you try, you should tune the learning rate and regularization strength. When doing this there are a couple important things to keep in mind:
+    If the parameters are working well, you should see improvement within a few hundred iterations
+    Remember the course-to-fine approach for hyperparameter tuning: start by testing a large range of hyperparameters for just a few training iterations to find the combinations of parameters that are working at all.
+    Once you have found some sets of parameters that seem to work, search more finely around these parameters. You may need to train for more epochs.
+
+Going above and beyond
+
+If you are feeling adventurous there are many other features you can implement to try and improve your performance. You are not required to implement any of these; however they would be good things to try for extra credit.
+    Alternative update steps: For the assignment we implemented SGD+momentum, RMSprop, and Adam; you could try alternatives like AdaGrad or AdaDelta.
+    Alternative activation functions such as leaky ReLU, parametric ReLU, or MaxOut.
+    Model ensembles
+    Data augmentation
+"""
+
+
+# user define layer， whatever you like ，just give me higher-accuracy
+class CustomLayerConvNet(object):
     """
   A three-layer convolutional network with the following architecture:
-  
+
   conv - relu - 2x2 max pool - affine - relu - affine - softmax
-  
+
   The network operates on minibatches of data that have shape (N, C, H, W)
   consisting of N images, each with height H and width W and with C input
   channels.
@@ -23,7 +48,7 @@ class ThreeLayerConvNet(object):
                  dtype=np.float32):
         """
     Initialize a new network.
-    
+
     Inputs:
     - input_dim: Tuple (C, H, W) giving size of input data
     - num_filters: Number of filters to use in the convolutional layer
@@ -66,7 +91,7 @@ class ThreeLayerConvNet(object):
     def loss(self, X, y=None):
         """
     Evaluate loss and gradient for the three-layer convolutional network.
-    
+
     Input / output: Same API as TwoLayerNet in fc_net.py.
     """
         W1, b1 = self.params['W1'], self.params['b1']
@@ -111,8 +136,8 @@ class ThreeLayerConvNet(object):
         ############################################################################
         loss, dscores = softmax_loss(scores, y)
         loss += 0.5 * self.reg * (
-        np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']) + np.sum(
-            self.params['W3'] * self.params['W3']))
+            np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']) + np.sum(
+                self.params['W3'] * self.params['W3']))
 
         affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
         grads['W3'] = affine2_dw + self.reg * self.params['W3']
