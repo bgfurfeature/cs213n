@@ -261,6 +261,7 @@ def batchnorm_backward(dout, cache):
     return dx, dgamma, dbeta
 
 
+# optimize method more fast
 def batchnorm_backward_alt(dout, cache):
     """
   Alternative backward pass for batch normalization.
@@ -624,7 +625,8 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     # be very short; ours is less than five lines.                              #
     #############################################################################
     N, C, H, W = x.shape
-    temp_output, cache = batchnorm_forward(x.transpose(0, 3, 2, 1).reshape((N * H * W, C)), gamma, beta, bn_param)
+    temp_output, cache = batchnorm_forward(x.transpose(0, 3, 2, 1)  # [N x W x H x C]
+                                           .reshape((N * H * W, C)), gamma, beta, bn_param)  # [N * H * W x C]
     out = temp_output.reshape(N, W, H, C).transpose(0, 3, 2, 1)
 
     #############################################################################

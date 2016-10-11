@@ -409,6 +409,16 @@ for k, v in data.iteritems():
 # Check the training-time forward pass by checking means and variances
 # of features both before and after spatial batch normalization
 
+small_data = data['X_train'][:10]
+N, C, H, W = small_data.shape
+print small_data.shape
+
+x_tr = small_data.transpose(0, 3, 2, 1)
+print x_tr.shape
+
+x_reshape = x_tr.reshape((N * H * W, C))
+print x_reshape.shape
+
 # N, C, H, W = 2, 3, 4, 5
 # x = 4 * np.random.randn(N, C, H, W) + 10
 #
@@ -488,20 +498,20 @@ for k, v in data.iteritems():
 # [conv-relu-conv-relu-pool]xN - [affine]xM - [softmax or SVM]
 
 
-model = CustomLayerConvNet(weight_scale=0.001, hidden_dim=500, reg=0.001)
-
-solver = Solver(model, data,
-                num_epochs=100, batch_size=50,
-                update_rule='adam',
-                optim_config={
-                  'learning_rate': 1e-3,
-                },
-                verbose=True, print_every=100)
-
-solver.train()
-
-# get the best_params
-param = solver.best_params
+# model = CustomLayerConvNet(weight_scale=0.001, hidden_dim=500, reg=0.001)
+#
+# solver = Solver(model, data,
+#                 num_epochs=100, batch_size=50,
+#                 update_rule='adam',
+#                 optim_config={
+#                   'learning_rate': 1e-3,
+#                 },
+#                 verbose=True, print_every=100)
+#
+# solver.train()
+#
+# # get the best_params
+# param = solver.best_params
 
 
 
