@@ -224,3 +224,39 @@ dw_shape
 dx_shape
 (4L, 3L, 5L, 5L)
 
+
+# solver
+X_val:  (1000L, 3L, 32L, 32L)
+X_train:  (49000L, 3L, 32L, 32L)
+X_test:  (1000L, 3L, 32L, 32L)
+y_val:  (1000L,)
+y_train:  (49000L,)
+y_test:  (1000L,)
+(Iteration 1 / 98000) loss: 2.304659
+(Epoch 0 / 100) train acc: 0.108000; val_acc: 0.112000
+(Iteration 101 / 98000) loss: 1.713541
+(Iteration 201 / 98000) loss: 1.806184
+(Iteration 301 / 98000) loss: 1.463680
+(Iteration 401 / 98000) loss: 1.604068
+(Iteration 501 / 98000) loss: 1.837579
+(Iteration 601 / 98000) loss: 1.729146
+(Iteration 701 / 98000) loss: 1.506137
+(Iteration 801 / 98000) loss: 1.649053
+(Iteration 901 / 98000) loss: 1.512476
+(Epoch 1 / 100) train acc: 0.468000; val_acc: 0.476000
+(Iteration 1001 / 98000) loss: 1.687717
+(Iteration 1101 / 98000) loss: 1.548754
+(Iteration 1201 / 98000) loss: 1.274884
+(Iteration 1301 / 98000) loss: 1.394712
+(Iteration 1401 / 98000) loss: 1.550906
+(Iteration 1501 / 98000) loss: 1.454540
+(Iteration 1601 / 98000) loss: 1.709905
+(Iteration 1701 / 98000) loss: 1.680327
+(Iteration 1801 / 98000) loss: 1.242595
+(Iteration 1901 / 98000) loss: 1.571167
+(Epoch 2 / 100) train acc: 0.514000; val_acc: 0.516000
+(Iteration 2001 / 98000) loss: 1.468283
+(Iteration 2101 / 98000) loss: 1.339539
+(Iteration 2201 / 98000) loss: 1.751169
+
+.....
