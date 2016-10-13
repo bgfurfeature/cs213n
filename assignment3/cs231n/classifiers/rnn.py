@@ -12,6 +12,12 @@ class CaptioningRNN(object):
   sequences of length T, has an RNN hidden dimension of H, uses word vectors
   of dimension W, and operates on minibatches of size N.
 
+  W ; word vector dimension
+  T: length of sequence
+  H: hidden size
+  D: input dimension
+  V: vocab size
+
   Note that we don't use any regularization for the CaptioningRNN.
   """
 
@@ -39,31 +45,32 @@ class CaptioningRNN(object):
         self.idx_to_word = {i: w for w, i in word_to_idx.iteritems()}
         self.params = {}
 
-        vocab_size = len(word_to_idx)
+        vocab_size = len(word_to_idx)  # same value to V
 
         self._null = word_to_idx['<NULL>']
         self._start = word_to_idx.get('<START>', None)
         self._end = word_to_idx.get('<END>', None)
+        print  word_to_idx
 
         # Initialize word vectors
-        self.params['W_embed'] = np.random.randn(vocab_size, wordvec_dim)
+        self.params['W_embed'] = np.random.randn(vocab_size, wordvec_dim)  # [V x W]
         self.params['W_embed'] /= 100
 
         # Initialize CNN -> hidden state projection parameters
-        self.params['W_proj'] = np.random.randn(input_dim, hidden_dim)
+        self.params['W_proj'] = np.random.randn(input_dim, hidden_dim)  # [D x H]
         self.params['W_proj'] /= np.sqrt(input_dim)
         self.params['b_proj'] = np.zeros(hidden_dim)
 
         # Initialize parameters for the RNN
         dim_mul = {'lstm': 4, 'rnn': 1}[cell_type]
-        self.params['Wx'] = np.random.randn(wordvec_dim, dim_mul * hidden_dim)
+        self.params['Wx'] = np.random.randn(wordvec_dim, dim_mul * hidden_dim)  # [W x [multiply x H ]]
         self.params['Wx'] /= np.sqrt(wordvec_dim)
-        self.params['Wh'] = np.random.randn(hidden_dim, dim_mul * hidden_dim)
+        self.params['Wh'] = np.random.randn(hidden_dim, dim_mul * hidden_dim)  # [ H x [multiply x H ]]
         self.params['Wh'] /= np.sqrt(hidden_dim)
-        self.params['b'] = np.zeros(dim_mul * hidden_dim)
+        self.params['b'] = np.zeros(dim_mul * hidden_dim)  # [multiply x H]
 
         # Initialize output to vocab weights
-        self.params['W_vocab'] = np.random.randn(hidden_dim, vocab_size)
+        self.params['W_vocab'] = np.random.randn(hidden_dim, vocab_size)  # [H x V]
         self.params['W_vocab'] /= np.sqrt(hidden_dim)
         self.params['b_vocab'] = np.zeros(vocab_size)
 
@@ -92,11 +99,16 @@ class CaptioningRNN(object):
         # by one relative to each other because the RNN should produce word (t+1)
         # after receiving word t. The first element of captions_in will be the START
         # token, and the first element of captions_out will be the first word.
-        captions_in = captions[:, :-1]
-        captions_out = captions[:, 1:]
-
+        captions_in = captions[:, :-1]  # abandon the last col [N x T -1]
+        # print "captions_in"
+        # print captions_in
+        captions_out = captions[:, 1:] # abandon the first col [N x T -1]
+        # print "captions_out"
+        # print captions_out
         # You'll need this
         mask = (captions_out != self._null)
+        # print "mask"
+        # print mask
 
         # Weight and bias for the affine transform from image features to initial
         # hidden state
@@ -146,7 +158,10 @@ class CaptioningRNN(object):
             h, h_cache = lstm_forward(embed_word, initial_h, Wx, Wh, b)
         # (4)
         affine_forward_out, affine_forward_cache = temporal_affine_forward(h, W_vocab, b_vocab)
-
+        # print "affine_forward_out"
+        # print affine_forward_out
+        # print "captions_out"
+        # print captions_out
         # (5)
         loss, dscore = temporal_softmax_loss(affine_forward_out, captions_out, mask, verbose=False)
 
