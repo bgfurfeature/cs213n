@@ -284,7 +284,7 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
     g = np.tanh(a[:, 3 * H:])  # [ N x H ]
 
     next_c = f * prev_c + i * g  # [ N x H ]
-    next_h = o * np.tanh(next_c) # [ N x H ]
+    next_h = o * np.tanh(next_c)  # [ N x H ]
     cache = (x, prev_h, prev_c, Wx, Wh, i, f, o, g, next_h, next_c)
     ##############################################################################
     #                               END OF YOUR CODE                             #
@@ -321,12 +321,15 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
 
     dnext_c += o * (1 - np.tanh(next_c) ** 2) * dnext_h
     di = dnext_c * g
-    df = dnext_c * prev_c
+    df = dnext_c * prev_c  # remember to multiply previous gradient
     do = dnext_h * np.tanh(next_c)
     dg = dnext_c * i
     dprev_c = f * dnext_c
-    da = np.hstack((i * (1 - i) * di, f * (1 - f) * df, o * (1 - o) * do, (1 - g ** 2) * dg))
-
+    # i * (1 - i) is dsigmoid
+    # (1 - g ** 2) is dtanh
+    da = np.hstack(
+        (i * (1 - i) * di, f * (1 - f) * df, o * (1 - o) * do,
+         (1 - g ** 2) * dg))  # [N x H - N x H - N x H - N x H] -> [ N x 4H]
     dx = da.dot(Wx.T)
     dprev_h = da.dot(Wh.T)
     dWx = x.T.dot(da)

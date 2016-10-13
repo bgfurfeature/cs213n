@@ -266,7 +266,7 @@ def rel_error(x, y):
 # print 'dx error: ', rel_error(dx, dx_num)
 #############################################################################
 #  RNN for image captioning
-
+# cell_type = rnn
 N, D, W, H = 10, 20, 30, 40
 word_to_idx = {'<NULL>': 0, 'cat': 2, 'dog': 3}
 V = len(word_to_idx)

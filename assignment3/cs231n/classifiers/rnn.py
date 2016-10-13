@@ -206,7 +206,7 @@ class CaptioningRNN(object):
       of captions should be the first sampled word, not the <START> token.
     """
         N = features.shape[0]
-        captions = self._null * np.ones((N, max_length), dtype=np.int32)
+        captions = self._null * np.ones((N, max_length), dtype=np.int32)  # [ N x MaxLength]
 
         # Unpack parameters
         W_proj, b_proj = self.params['W_proj'], self.params['b_proj']
