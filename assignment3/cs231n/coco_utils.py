@@ -3,6 +3,16 @@ import numpy as np
 import h5py
 
 
+# idx_to_word <type 'list'> 1004
+# train_captions <type 'numpy.ndarray'> (400135, 17) int32
+# val_captions <type 'numpy.ndarray'> (195954, 17) int32
+# train_image_idxs <type 'numpy.ndarray'> (400135,) int32
+# val_features <type 'numpy.ndarray'> (40504, 512) float32
+# val_image_idxs <type 'numpy.ndarray'> (195954,) int32
+# train_features <type 'numpy.ndarray'> (82783, 512) float32
+# train_urls <type 'numpy.ndarray'> (82783,) |S63
+# val_urls <type 'numpy.ndarray'> (40504,) |S63
+# word_to_idx <type 'dict'> 1004
 def load_coco_data(base_dir='cs231n/datasets/coco_captioning',
                    max_train=None,
                    pca_features=True):
