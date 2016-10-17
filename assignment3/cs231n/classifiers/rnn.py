@@ -47,10 +47,14 @@ class CaptioningRNN(object):
 
         vocab_size = len(word_to_idx)  # same value to V
 
+        # we append <NULL> tokens to the end of each caption so they all have the same length.
+        #  We don't want these <NULL> tokens to count toward the loss or gradient,
+        # so in addition to scores and ground-truth labels our loss function also accepts a mask array
+        # that tells it which elements of the scores count towards the loss.
         self._null = word_to_idx['<NULL>']
-        self._start = word_to_idx.get('<START>', None)
+        self._start = word_to_idx.get('<START>', None)  # dict exits
         self._end = word_to_idx.get('<END>', None)
-        print  word_to_idx
+        # print word_to_idx
 
         # Initialize word vectors
         self.params['W_embed'] = np.random.randn(vocab_size, wordvec_dim)  # [V x W]
@@ -102,11 +106,11 @@ class CaptioningRNN(object):
         captions_in = captions[:, :-1]  # abandon the last col [N x T -1]
         # print "captions_in"
         # print captions_in
-        captions_out = captions[:, 1:] # abandon the first col [N x T -1]
+        captions_out = captions[:, 1:]  # abandon the first col [<START>] [N x T -1]
         # print "captions_out"
         # print captions_out
         # You'll need this
-        mask = (captions_out != self._null)
+        mask = (captions_out != self._null)  # <NULL> don't need to count on scores
         # print "mask"
         # print mask
 
@@ -165,7 +169,7 @@ class CaptioningRNN(object):
         # (5)
         loss, dscore = temporal_softmax_loss(affine_forward_out, captions_out, mask, verbose=False)
 
-        # backprop
+        # back prop
         daffine_out, grads['W_vocab'], grads['b_vocab'] = temporal_affine_backward(dscore, affine_forward_cache)
         if self.cell_type == 'rnn':
             dword_vector, dh0, grads['Wx'], grads['Wh'], grads['b'] = rnn_backward(daffine_out, h_cache)
@@ -240,7 +244,7 @@ class CaptioningRNN(object):
         prev_c = np.zeros(prev_h.shape)
 
         # self._start is the index of the word '<START>'
-        current_word_index = [self._start] * N
+        current_word_index = [self._start] * N  # jump word '<START>'
 
         for i in range(max_length):
             x = W_embed[current_word_index]  # get word_vector from word_index

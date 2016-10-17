@@ -5,6 +5,7 @@ from cs231n.fast_layers import *
 from cs231n.layer_utils import *
 
 
+# 9 convolutional layers (with spatial batch normalization) and 1 fully-connected hidden layer (with batch normalization).
 class PretrainedCNN(object):
     def __init__(self, dtype=np.float32, num_classes=100, input_size=64, h5_file=None):
         self.dtype = dtype

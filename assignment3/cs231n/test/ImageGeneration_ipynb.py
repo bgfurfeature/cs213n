@@ -4,7 +4,6 @@ import time, os, json
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.misc import imresize, imread
-
 from cs231n.classifiers.pretrained_cnn import PretrainedCNN
 from cs231n.data_utils import load_tiny_imagenet
 from cs231n.gradient_check import eval_numerical_gradient, eval_numerical_gradient_array
@@ -13,6 +12,7 @@ from cs231n.captioning_solver import CaptioningSolver
 from cs231n.classifiers.rnn import CaptioningRNN
 from cs231n.coco_utils import load_coco_data, sample_coco_minibatch, decode_captions
 from cs231n.image_utils import image_from_url, blur_image, deprocess_image, preprocess_image
+
 
 #############################################################################
 
@@ -67,11 +67,11 @@ def create_class_visualization(target_y, model, **kwargs):
         scores, cache = model.forward(X, mode='test')
 
         dscores = np.zeros(scores.shape)
-        dscores[:,target_y] = 1
+        dscores[:, target_y] = 1
 
         w, _ = model.backward(dscores, cache)
 
-        X += learning_rate*( w + 2 * l2_reg * X)
+        X += learning_rate * (w + 2 * l2_reg * X)
 
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -143,14 +143,14 @@ def invert_features(target_feats, layer, model, **kwargs):
         ############################################################################
         layer_out, layer_cache = model.forward(X, start=None, end=layer, mode='test')
 
-        loss_noreg = np.sum((layer_out-target_feats)**2) # loss w.o. regularization term
-        if t%show_every==0:
+        loss_noreg = np.sum((layer_out - target_feats) ** 2)  # loss w.o. regularization term
+        if t % show_every == 0:
             print "loss (w.o. regularization) = ", loss_noreg
         # dloss is the gradient of the reconstruction loss w.r.t. layer_out
-        dloss = 2*(layer_out - target_feats)
+        dloss = 2 * (layer_out - target_feats)
         # dX is the gradient of the reconstruction loss w.r.t. Image
-        dX,_ =  model.backward(dloss, layer_cache)
-        X -= learning_rate*(dX+2*l2_reg*X)
+        dX, _ = model.backward(dloss, layer_cache)
+        X -= learning_rate * (dX + 2 * l2_reg * X)
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -168,6 +168,7 @@ def invert_features(target_feats, layer, model, **kwargs):
             plt.axis('off')
             plt.title('t = %d' % t)
             plt.show()
+
 
 #############################################################################
 # Shallow feature reconstruction
@@ -228,6 +229,7 @@ kwargs = {
 
 X = invert_features(feats, layer, model, **kwargs)
 
+
 #############################################################################
 # DeepDream
 def deepdream(X, layer, model, **kwargs):
@@ -267,8 +269,8 @@ def deepdream(X, layer, model, **kwargs):
         # update the image X.                                                      #
         ############################################################################
         layer_out, layer_cache = model.forward(X, start=None, end=layer, mode='test')
-        dX,_ =  model.backward(layer_out, layer_cache)
-        X += learning_rate*dX
+        dX, _ = model.backward(layer_out, layer_cache)
+        X += learning_rate * dX
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -289,6 +291,7 @@ def deepdream(X, layer, model, **kwargs):
             plt.axis('off')
             plt.show()
     return X
+
 
 #############################################################################
 # Generate some images

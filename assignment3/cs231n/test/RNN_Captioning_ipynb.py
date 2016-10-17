@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from cs231n.gradient_check import eval_numerical_gradient, eval_numerical_gradient_array
 from cs231n.rnn_layers import *
 from cs231n.classifiers.rnn import CaptioningRNN
+from cs231n.coco_utils import *
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
@@ -27,27 +28,33 @@ def rel_error(x, y):
 # We'll work with dimensionality-reduced features for this notebook, but feel
 # free to experiment with the original features by changing the flag below.
 
-# data = load_coco_data(pca_features=True)
-#
-# # Print out all the keys and values from the data dictionary
-# for k, v in data.iteritems():
-#   if type(v) == np.ndarray:
-#     print k, type(v), v.shape, v.dtype
-#   else:
-#     print k, type(v), len(v)
+data = load_coco_data(pca_features=True)
+
+# Print out all the keys and values from the data dictionary
+for k, v in data.iteritems():
+  if type(v) == np.ndarray:
+    print k, type(v), v.shape, v.dtype
+  else:
+    print k, type(v), len(v)
 
 # Look at the data
 # Sample a minibatch and show the images and captions
 
-# batch_size = 3
-#
-# captions, features, urls = sample_coco_minibatch(data, batch_size=batch_size)
-# for i, (caption, url) in enumerate(zip(captions, urls)):
-#   plt.imshow(image_from_url(url))
-#   plt.axis('off')
-#   caption_str = decode_captions(caption, data['idx_to_word'])
-#   plt.title(caption_str)
-#   plt.show()
+batch_size = 3
+
+captions, features, urls = sample_coco_minibatch(data, batch_size=batch_size)
+print 'idx_to_word'
+print data['idx_to_word']
+for i, (caption, url) in enumerate(zip(captions, urls)):
+  # plt.imshow(image_from_url(url))
+  # plt.axis('off')
+  print "caption"
+  print caption
+  caption_str = decode_captions(caption, data['idx_to_word'])
+  print "caption_str"
+  print caption_str
+  # plt.title(caption_str)
+  # plt.show()
 #############################################################################
 # Recurrent Neural Networks
 # Vanilla RNN: step forward ： a single timestep of a vanilla RNN
@@ -267,36 +274,36 @@ def rel_error(x, y):
 #############################################################################
 #  RNN for image captioning
 # cell_type = rnn
-N, D, W, H = 10, 20, 30, 40
-word_to_idx = {'<NULL>': 0, 'cat': 2, 'dog': 3}
-V = len(word_to_idx)
-T = 13
-
-model = CaptioningRNN(word_to_idx,
-                      input_dim=D,
-                      wordvec_dim=W,
-                      hidden_dim=H,
-                      cell_type='rnn',
-                      dtype=np.float64)
-
-# Set all model parameters to fixed values
-# print "model.params[k]"
-for k, v in model.params.iteritems():
-    model.params[k] = np.linspace(-1.4, 1.3, num=v.size).reshape(*v.shape)
-    # print "key ;" + k
-    # print model.params[k]
-
-features = np.linspace(-1.5, 0.3, num=(N * D)).reshape(N, D)
-captions = (np.arange(N * T) % V).reshape(N, T)  # [N x T]
-# print "captions"
-# print captions
-
-loss, grads = model.loss(features, captions)
-expected_loss = 9.83235591003
-
-print 'loss: ', loss
-print 'expected loss: ', expected_loss
-print 'difference: ', abs(loss - expected_loss)
+# N, D, W, H = 10, 20, 30, 40
+# word_to_idx = {'<NULL>': 0, 'cat': 2, 'dog': 3}
+# V = len(word_to_idx)
+# T = 13
+#
+# model = CaptioningRNN(word_to_idx,
+#                       input_dim=D,
+#                       wordvec_dim=W,
+#                       hidden_dim=H,
+#                       cell_type='rnn',
+#                       dtype=np.float64)
+#
+# # Set all model parameters to fixed values
+# # print "model.params[k]"
+# for k, v in model.params.iteritems():
+#     model.params[k] = np.linspace(-1.4, 1.3, num=v.size).reshape(*v.shape)
+#     # print "key ;" + k
+#     # print model.params[k]
+#
+# features = np.linspace(-1.5, 0.3, num=(N * D)).reshape(N, D)
+# captions = (np.arange(N * T) % V).reshape(N, T)  # [N x T]
+# # print "captions"
+# # print captions
+#
+# loss, grads = model.loss(features, captions)
+# expected_loss = 9.83235591003
+#
+# print 'loss: ', loss
+# print 'expected loss: ', expected_loss
+# print 'difference: ', abs(loss - expected_loss)
 
 
 # batch_size = 2
