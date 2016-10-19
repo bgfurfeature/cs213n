@@ -1,6 +1,7 @@
 import numpy as np
 from cs231n import optim
 
+
 class Solver(object):
     """
   A Solver encapsulates all the logic necessary for training classification
@@ -221,6 +222,14 @@ class Solver(object):
 
         return y_pred
 
+    def load_model(self,model_file):
+        f = open("model","r")
+        lines = f.readlines()
+        for item in lines:
+            k, v = item.split("=")
+            self.model.params[k] = float(v)
+        f.close()
+
     def train(self):
         """
     Run optimization to train the model.
@@ -273,6 +282,3 @@ class Solver(object):
         for k, v in self.model.params.iteritems():
             f.write(k + "=" + v + "\n")
         f.close()
-
-
-
