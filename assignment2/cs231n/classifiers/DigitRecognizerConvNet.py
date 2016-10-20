@@ -246,7 +246,7 @@ class LeNet(object):
         # conv_out, conv_cache = conv_forward_im2col(X, W1, b1, conv_param)  # need to set right env
         conv_out, conv_cache = conv_forward_fast(X, W1, b1, conv_param1)
         relu1_out, relu1_cache = relu_forward(conv_out)
-        pool_out, pool_cache = max_pool_forward_naive(relu1_out, pool_param) # can not use fast method because of back_ward method, backward method between two convLayer can not be execute correctly
+        pool_out, pool_cache = max_pool_forward_naive(relu1_out, pool_param)  # can not use fast method because of back_ward method, backward method between two convLayer can not be execute correctly
 
         conv2_out,conv2_cache = conv_forward_fast(pool_out, W1_2, b1_2, conv_param2)
         relu2_out, relu2_cache = relu_forward(conv2_out)
