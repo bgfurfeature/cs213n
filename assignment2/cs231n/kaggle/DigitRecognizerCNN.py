@@ -63,7 +63,9 @@ test_data = data["X_test"]
 
 t0 = time()
 
-model = LeNet(weight_scale=0.001, hidden_dim=500, reg=0.001)
+# model = conv_relu_max_pool_affine_relu_affineNet(weight_scale=0.001, hidden_dim=500, reg=0.001)
+# use LeNet
+model = LeNet(weight_scale=0.001, reg=0.001)
 
 solver = Solver(model, data,
                 num_epochs=5, batch_size=50,

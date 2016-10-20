@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 
 class test(object):
@@ -7,11 +8,17 @@ class test(object):
 
         self.params = {}
 
-    # params = {'w1': 0.9, 'w2': 0.87}
-    # f = open('model.txt', 'a')
-    # for k, v in params.iteritems():
-    #     f.write(k + "=" + str(v) + "\n")
-    # f.close()
+        # w1 = np.array([[0, 1, 2], [3, 4, 5]])
+        #
+        # w2 = np.random.normal(0, 1e-2, (7, 1, 2, 2))
+        #
+        # # params = {'w1': 0.9, 'w2': 0.87}
+        # self.params["w1"] = w1.copy()
+        # self.params['w2'] = w2
+        # f = open('model.txt', 'a')
+        # for k, v in self.params.iteritems():
+        #     f.write(k + "=" + str(v) + "\n")
+        # f.close()
 
     def load_model(self, model_file):
         f = open(model_file, "r")
@@ -25,4 +32,4 @@ class test(object):
 
 test = test()
 
-test.load_model("model.txt")
+# test.load_model("model.txt")
