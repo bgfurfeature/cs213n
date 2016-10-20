@@ -1,9 +1,11 @@
+""" url - https://www.kaggle.com/c/digit-recognizer """
+
 from time import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from cs231n.classifiers.DigitRecognizerConvNet import *
-from cs231n.kaggle.solver import Solver
+from cs231n.kaggle.DigitRecognizerConvNetSolver import Solver
 import matplotlib.cm as cm
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
@@ -52,7 +54,7 @@ data = load_data("F:\SmartData-X\DataSet\KaggleCompetition\Digit Recongizer")
 train_data = data["X_train"]
 print train_data.shape
 
-# print train_data[0][0]  # 28 x 28
+# print train_data[0][0]  # 1 x 28 x 28
 
 # draw_a_picture(train_data)
 
@@ -64,7 +66,7 @@ t0 = time()
 model = LeNet(weight_scale=0.001, hidden_dim=500, reg=0.001)
 
 solver = Solver(model, data,
-                num_epochs=10, batch_size=50,
+                num_epochs=5, batch_size=50,
                 update_rule='adam',
                 optim_config={
                     'learning_rate': 1e-3,

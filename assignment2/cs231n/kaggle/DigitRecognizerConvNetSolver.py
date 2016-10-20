@@ -222,8 +222,8 @@ class Solver(object):
 
         return y_pred
 
-    def load_model(self,model_file):
-        f = open("model","r")
+    def load_model(self, model_file):
+        f = open("model", "r")
         lines = f.readlines()
         for item in lines:
             k, v = item.split("=")
@@ -278,7 +278,11 @@ class Solver(object):
 
         # At the end of training swap the best params into the model
         self.model.params = self.best_params  # this param will be used in predict other data
-        f = open('digit_r_params.txt', 'a')
-        for k, v in self.model.params.iteritems():
-            f.write(k + "=" + v + "\n")
-        f.close()
+
+        try:
+            f = open('digit_r_params.txt', 'a')
+            for k, v in self.model.params.iteritems():
+                f.write(k + "=" + str(v) + "\n")
+            f.close()
+        except:
+            pass
