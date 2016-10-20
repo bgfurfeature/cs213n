@@ -42,7 +42,7 @@ def conv_forward_im2col(x, w, b, conv_param):
 
 def conv_forward_strides(x, w, b, conv_param):
     N, C, H, W = x.shape
-    F, C2, HH, WW = w.shape
+    F, _, HH, WW = w.shape
     stride, pad = conv_param['stride'], conv_param['pad']
 
     # Check dimensions
@@ -60,13 +60,13 @@ def conv_forward_strides(x, w, b, conv_param):
     out_w = (W - WW) / stride + 1
 
     # Perform an im2col operation by picking clever strides
-    shape = (C2, HH, WW, N, out_h, out_w)
+    shape = (C, HH, WW, N, out_h, out_w)
     strides = (H * W, W, 1, C * H * W, stride * W, stride)
     strides = x.itemsize * np.array(strides)
     x_stride = np.lib.stride_tricks.as_strided(x_padded,
                                                shape=shape, strides=strides)
     x_cols = np.ascontiguousarray(x_stride)
-    x_cols.shape = (C2 * HH * WW, N * out_h * out_w)
+    x_cols.shape = (C * HH * WW, N * out_h * out_w)
 
     # Now all our convolutions are a big matrix multiply
     res = w.reshape(F, -1).dot(x_cols) + b.reshape(-1, 1)
