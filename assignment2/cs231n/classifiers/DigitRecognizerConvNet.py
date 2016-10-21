@@ -143,8 +143,8 @@ class conv_relu_max_pool_affine_relu_affineNet(object):
 # LeNet try                                                                                                            #
 # firstConv -> 28 x 28 x1 with filter 5 x 5 x 6, stride 1, pad 2 transformed to 28 x 28 x 6                            #
 # maxpool ->  28 x 28 x 6 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 6                                    #
-# secondConv -> 14 x 14 x 6 with  filter 5 x 5 x 16, stride 1, pad 0 transformed to 10 x 10 x 16                       #
-# maxpool -> 10 x 10 x 16 with pool size 2 x 2, stride 2 transformed to 5 x 5 x 16                                     #
+# secondConv -> 14 x 14 x 6 with  filter 5 x 5 x 16, stride 1, pad 0 transformed to 10 x 10 x 6                        #
+# maxpool -> 10 x 10 x 6 with pool size 2 x 2, stride 2 transformed to 5 x 5 x 6                                       #
 # fc_1 -> neuron number 120                                                                                            #
 # fc_2 -> neuron number 84                                                                                             #
 # out -> classes 10                                                                                                    #
