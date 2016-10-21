@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from cs231n.classifiers.DigitRecognizerConvNet import *
-from cs231n.kaggle.DigitRecognizer.DigitRecognizerConvNetSolver import Solver
+
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
