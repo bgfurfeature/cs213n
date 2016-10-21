@@ -162,7 +162,7 @@ class LeNet(object):
   channels.
   """
 
-    def __init__(self, input_dim=(1, 28, 28), num_filters1=6, num_filters2=16, filter_size=5,
+    def __init__(self, input_dim=(1, 28, 28), num_filters1=6, num_filters2=6, filter_size=5,
                  hidden_dim1=120, hidden_dim2=84, num_classes=10, weight_scale=1e-3, reg=0.0,
                  dtype=np.float32):
         """
@@ -194,13 +194,14 @@ class LeNet(object):
         # of the output affine layer.                                              #
         ############################################################################
         C, H, W = input_dim
+
         self.params['W1'] = np.random.normal(0, weight_scale, (num_filters1, C, filter_size, filter_size))
         self.params['b1'] = np.zeros(num_filters1)
 
-        self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
-        self.params['b1_2'] = np.zeros(num_filters2)
+        # self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
+        # self.params['b1_2'] = np.zeros(num_filters2)
 
-        self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
+        self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
         self.params['b2'] = np.zeros(hidden_dim1)
 
         self.params['W3'] = np.random.normal(0, weight_scale, (hidden_dim1, hidden_dim2))
@@ -223,7 +224,7 @@ class LeNet(object):
     Input / output: Same API as TwoLayerNet in fc_net.py.
     """
         W1, b1 = self.params['W1'], self.params['b1']
-        W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
+        # W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
         W2, b2 = self.params['W2'], self.params['b2']
         W3, b3 = self.params['W3'], self.params['b3']
         W4, b4 = self.params['W4'], self.params['b4']
@@ -246,13 +247,13 @@ class LeNet(object):
         # conv_out, conv_cache = conv_forward_im2col(X, W1, b1, conv_param)  # need to set right env
         conv_out, conv_cache = conv_forward_fast(X, W1, b1, conv_param1)
         relu1_out, relu1_cache = relu_forward(conv_out)
-        pool_out, pool_cache = max_pool_forward_naive(relu1_out, pool_param)  # can not use fast method because of back_ward method, backward method between two convLayer can not be execute correctly
+        pool_out, pool_cache = max_pool_forward_fast(relu1_out, pool_param)  # can not use fast method because of back_ward method, backward method between two convLayer can not be execute correctly
 
-        conv2_out,conv2_cache = conv_forward_fast(pool_out, W1_2, b1_2, conv_param2)
-        relu2_out, relu2_cache = relu_forward(conv2_out)
-        pool2_out, pool2_cache = max_pool_forward_fast(relu2_out, pool_param)
+        # conv2_out,conv2_cache = conv_forward_fast(pool_out, W1_2, b1_2, conv_param2)
+        # relu2_out, relu2_cache = relu_forward(conv2_out)
+        # pool2_out, pool2_cache = max_pool_forward_fast(relu2_out, pool_param)
 
-        affine_relu_out, affine_relu_cache = affine_relu_forward(pool2_out, W2, b2)
+        affine_relu_out, affine_relu_cache = affine_relu_forward(pool_out, W2, b2)
         affine_relu_out2, affine_relu_cache2 = affine_relu_forward(affine_relu_out, W3, b3)
         affine2_out, affine2_cache = affine_forward(affine_relu_out2, W4, b4)
         scores = affine2_out
@@ -274,7 +275,7 @@ class LeNet(object):
         loss, dscores = softmax_loss(scores, y)
         loss += 0.5 * self.reg * (
             np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']) + np.sum(
-                self.params['W3'] * self.params['W3']) + np.sum(self.params['W1_2'] * self.params['W1_2']) + np.sum(self.params['W4'] * self.params['W4']))
+                self.params['W3'] * self.params['W3'])+ np.sum(self.params['W4'] * self.params['W4'])) # + np.sum(self.params['W1_2'] * self.params['W1_2']) )
 
         affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
         grads['W4'] = affine2_dw + self.reg * self.params['W4']
@@ -288,14 +289,14 @@ class LeNet(object):
         grads['W2'] = affine1_dw + self.reg * self.params['W2']
         grads['b2'] = affine1_db
 
-        pool_dx = max_pool_backward_fast(affine1_dx, pool2_cache)
-        relu_dx = relu_backward(pool_dx, relu2_cache)
-        # conv_dx, conv_dw, conv_db = conv_backward_im2col(relu_dx, conv_cache)  # need to set right env
-        conv_dx, conv_dw, conv_db = conv_backward_naive(relu_dx, conv2_cache)
-        grads['W1_2'] = conv_dw + self.reg * self.params['W1_2']
-        grads['b1_2'] = conv_db
+        # pool_dx = max_pool_backward_fast(affine1_dx, pool2_cache)
+        # relu_dx = relu_backward(pool_dx, relu2_cache)
+        # # conv_dx, conv_dw, conv_db = conv_backward_im2col(relu_dx, conv_cache)  # need to set right env
+        # conv_dx, conv_dw, conv_db = conv_backward_naive(relu_dx, conv2_cache)
+        # grads['W1_2'] = conv_dw + self.reg * self.params['W1_2']
+        # grads['b1_2'] = conv_db
 
-        pool2_dx = max_pool_backward_naive(conv_dx, pool_cache)
+        pool2_dx = max_pool_backward_fast(affine1_dx, pool_cache)
         relu2_dx = relu_backward(pool2_dx, relu1_cache)
         # conv_dx, conv_dw, conv_db = conv_backward_im2col(relu_dx, conv_cache)  # need to set right env
         conv2_dx, conv2_dw, conv2_db = conv_backward_naive(relu2_dx, conv_cache)

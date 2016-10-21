@@ -465,7 +465,7 @@ def conv_backward_naive(dout, cache):
   """
     dx, dw, db = None, None, None
     #############################################################################
-    # TODO: Implement the convolutional backward pass.                          #
+    # TODO: Implement the convolutional backward pass.                #
     #############################################################################
     x, w, b, conv_param, _ = cache
     stride = conv_param['stride']
