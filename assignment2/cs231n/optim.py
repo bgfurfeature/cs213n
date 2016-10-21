@@ -160,3 +160,22 @@ def adam(x, dx, config=None):
     #############################################################################
 
     return next_x, config
+
+
+def adadelta(x, dx, config=None):
+
+    if config is None: config = {}
+    config.setdefault('epsilon', 1e-8)
+    config.setdefault('ro', 0.95)
+    config.setdefault('g', np.zeros_like(x))
+    config.setdefault('m', np.zeros_like(x))
+
+    config['g'] = config['g'] * config['ro'] + (1- config['ro']) * (dx**2)
+
+    v = - np.sqrt((config['m'] + config['epsilon']) / ( config['g'] + config['epsilon'])) * dx
+
+    config['m'] = config['m'] * config['ro'] + (1 - config['ro']) * v**2
+
+    x += v
+
+    return x, config
