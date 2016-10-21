@@ -1,10 +1,4 @@
-from time import time
-import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from cs231n.classifiers.DigitRecognizerConvNet import *
-from cs231n.kaggle.DigitRecognizerConvNetSolver import Solver
-import matplotlib.cm as cm
 
 
 # Load the (preprocessed) data.
