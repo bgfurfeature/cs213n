@@ -210,6 +210,7 @@ class LeNet(object):
         self.params['W4'] = np.random.normal(0, weight_scale, (hidden_dim2, num_classes))
         self.params['b4'] = np.zeros(num_classes)
 
+
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -255,7 +256,9 @@ class LeNet(object):
 
         affine_relu_out, affine_relu_cache = affine_relu_forward(pool_out, W2, b2)
         affine_relu_out2, affine_relu_cache2 = affine_relu_forward(affine_relu_out, W3, b3)
+
         affine2_out, affine2_cache = affine_forward(affine_relu_out2, W4, b4)
+
         scores = affine2_out
 
         ############################################################################
@@ -282,6 +285,7 @@ class LeNet(object):
         grads['b4'] = affine2_db
 
         affine3_dx, affine3_dw, affine3_db = affine_relu_backward(affine2_dx, affine_relu_cache2)
+
         grads['W3'] = affine3_dw + self.reg * self.params['W3']
         grads['b3'] = affine3_db
 

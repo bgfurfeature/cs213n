@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from cs231n.classifiers.DigitRecognizerConvNet import *
+from cs231n.kaggle.DigitRecognizer.DigitRecognizerConvNetSolver import *
 
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
@@ -70,7 +71,7 @@ model = LeNet(weight_scale=0.001, reg=0.001)
 
 solver = Solver(model, data,
                 num_epochs=5, batch_size=50,
-                update_rule='adam',
+                update_rule='adadelta',
                 optim_config={
                     'learning_rate': 1e-3,
                 },
