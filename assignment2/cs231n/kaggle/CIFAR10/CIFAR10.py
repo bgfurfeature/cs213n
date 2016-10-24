@@ -5,53 +5,16 @@ from time import time
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from cs231n.classifiers.DigitRecognizerConvNet import *
-from cs231n.kaggle.DigitRecognizer.DigitRecognizerConvNetSolver import *
-
+from cs231n.classifiers.CIFAR10NetWork import *
+from cs231n.kaggle.CIFAR10.CIFAR10Solver import *
+from cs231n.kaggle.CIFAR10.load_data import *
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
 
-
-# draw the picture from a pixel matrix
-def draw_a_picture(data_matrix):
-    plt.imshow(data_matrix[0][0], cmap=cm.binary)
-    plt.show()
-
-
 # Load the (preprocessed) data.
-def load_data(filename):
-    data_set = pd.read_csv(filename + "\\train.csv")
-    train_target = data_set[[0]].values.ravel()
-    train = data_set.iloc[:, 1:].values
-    test = pd.read_csv(filename + "\\test.csv").values
-
-    # convert to array, specify data type, and reshape
-    X_train = np.array(train).reshape(42000, 1, 28, 28).astype(np.uint8)
-    y_train = np.array(train_target).astype(np.uint8)
-    # X_train = np.array(train).reshape((-1, 1, 28, 28)).astype(np.uint8)
-    test = np.array(test).reshape(28000, 1, 28, 28).astype(np.uint8)
-
-    num_training = 41000
-    num_validation = 1000
-
-    mask = range(num_training, num_training + num_validation)
-    X_val = X_train[mask]
-    y_val = y_train[mask]
-    mask = range(num_training)
-    X_train = X_train[mask]
-    y_train = y_train[mask]
-
-    return {
-        'X_train': X_train, 'y_train': y_train,
-        'X_val': X_val, 'y_val': y_val,
-        'X_test': test
-    }
-
-
-data = load_data("F:\SmartData-X\DataSet\KaggleCompetition\Digit Recongizer")
+data = get_CIFAR10_data()
 
 train_data = data["X_train"]
 print train_data.shape
@@ -67,10 +30,10 @@ t0 = time()
 
 # model = conv_relu_max_pool_affine_relu_affineNet(weight_scale=0.001, hidden_dim=500, reg=0.001)
 # use LeNet
-model = LeNet(weight_scale=0.001, reg=0.001)
+model = CIFAR10NetWork(weight_scale=0.001, reg=0.001)
 
 solver = Solver(model, data,
-                num_epochs=5, batch_size=100,
+                num_epochs=20, batch_size=100,
                 update_rule='adadelta',
                 optim_config={
                     'learning_rate': 1e-3,

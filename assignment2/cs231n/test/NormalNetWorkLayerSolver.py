@@ -3,7 +3,6 @@ custom network structures
 """
 
 from cs231n.test.load_data import *
-from cs231n import *
 ##############################################################################
 # TODO: Use a Solver instance to train a TwoLayerNet that achieves at least  #
 # 50% accuracy on the validation set.                                        #
