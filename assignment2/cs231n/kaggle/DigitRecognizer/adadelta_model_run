@@ -3,7 +3,8 @@
 # fc_1 -> neuron number 120
 # fc_2 -> neuron number 84
 # out -> classes 10
-use adadelta to update params: 0.98057
+use adadelta to update params;batch_size = 50
+0.98057
 
 (41000L, 1L, 28L, 28L)
 (Iteration 1 / 4100) loss: 2.302661
