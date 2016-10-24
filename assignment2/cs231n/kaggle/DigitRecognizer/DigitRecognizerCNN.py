@@ -70,7 +70,7 @@ t0 = time()
 model = LeNet(weight_scale=0.001, reg=0.001)
 
 solver = Solver(model, data,
-                num_epochs=5, batch_size=50,
+                num_epochs=5, batch_size=100,
                 update_rule='adadelta',
                 optim_config={
                     'learning_rate': 1e-3,

@@ -110,7 +110,7 @@ class Solver(object):
         self.optim_config = kwargs.pop('optim_config', {})
         self.lr_decay = kwargs.pop('lr_decay', 1.0)
         self.batch_size = kwargs.pop('batch_size', 100)
-        self.num_epochs = kwargs.pop('num_epochs', 10)
+        self.num_epochs = kwargs.pop('num_epochs', 15)
 
         self.print_every = kwargs.pop('print_every', 10)
         self.verbose = kwargs.pop('verbose', True)
@@ -302,8 +302,8 @@ class Solver(object):
         num_iterations = self.num_epochs * iterations_per_epoch
 
         for t in xrange(num_iterations):
-            # self._step()
-            self.refactor_step()
+            self._step()
+            # self.refactor_step()
 
             # Maybe print training loss
             if self.verbose and t % self.print_every == 0:
@@ -323,9 +323,9 @@ class Solver(object):
             first_it = (t == 0)
             last_it = (t == num_iterations + 1)
             if first_it or last_it or epoch_end:
-                train_acc = self.refactor_check_accuracy(self.X_train, self.y_train,
+                train_acc = self.check_accuracy(self.X_train, self.y_train,
                                                 num_samples=1000)
-                val_acc = self.refactor_check_accuracy(self.X_val, self.y_val)
+                val_acc = self.check_accuracy(self.X_val, self.y_val)
                 self.train_acc_history.append(train_acc)
                 self.val_acc_history.append(val_acc)
 

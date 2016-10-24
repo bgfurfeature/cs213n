@@ -198,14 +198,13 @@ class LeNet(object):
         self.params['W1'] = np.random.normal(0, weight_scale, (num_filters1, C, filter_size, filter_size))
         self.params['b1'] = np.zeros(num_filters1)
 
-        self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
-        self.params['b1_2'] = np.zeros(num_filters2)
+        # self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
+        # self.params['b1_2'] = np.zeros(num_filters2)
+        # self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
+        # self.params['b2'] = np.zeros(hidden_dim1) # for double conv layer setting
 
-        self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
+        self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
         self.params['b2'] = np.zeros(hidden_dim1)
-
-        # self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
-        # self.params['b2'] = np.zeros(hidden_dim1)
 
         self.params['W3'] = np.random.normal(0, weight_scale, (hidden_dim1, hidden_dim2))
         self.params['b3'] = np.zeros(hidden_dim2)
@@ -228,7 +227,7 @@ class LeNet(object):
     Input / output: Same API as TwoLayerNet in fc_net.py.
     """
         W1, b1 = self.params['W1'], self.params['b1']
-        W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
+        # W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
         W2, b2 = self.params['W2'], self.params['b2']
         W3, b3 = self.params['W3'], self.params['b3']
         W4, b4 = self.params['W4'], self.params['b4']
