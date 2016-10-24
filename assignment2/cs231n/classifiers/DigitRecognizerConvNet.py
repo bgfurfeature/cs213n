@@ -198,11 +198,14 @@ class LeNet(object):
         self.params['W1'] = np.random.normal(0, weight_scale, (num_filters1, C, filter_size, filter_size))
         self.params['b1'] = np.zeros(num_filters1)
 
-        # self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
-        # self.params['b1_2'] = np.zeros(num_filters2)
+        self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
+        self.params['b1_2'] = np.zeros(num_filters2)
 
-        self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
+        self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
         self.params['b2'] = np.zeros(hidden_dim1)
+
+        # self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
+        # self.params['b2'] = np.zeros(hidden_dim1)
 
         self.params['W3'] = np.random.normal(0, weight_scale, (hidden_dim1, hidden_dim2))
         self.params['b3'] = np.zeros(hidden_dim2)
@@ -225,7 +228,7 @@ class LeNet(object):
     Input / output: Same API as TwoLayerNet in fc_net.py.
     """
         W1, b1 = self.params['W1'], self.params['b1']
-        # W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
+        W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
         W2, b2 = self.params['W2'], self.params['b2']
         W3, b3 = self.params['W3'], self.params['b3']
         W4, b4 = self.params['W4'], self.params['b4']
@@ -306,6 +309,118 @@ class LeNet(object):
         conv2_dx, conv2_dw, conv2_db = conv_backward_naive(relu2_dx, conv_cache)
         grads['W1'] = conv2_dw + self.reg * self.params['W1']
         grads['b1'] = conv2_db
+
+        ############################################################################
+        #                             END OF YOUR CODE                             #
+        ############################################################################
+
+        return loss, grads
+
+    # refactor fast_ward and backward method for simplify
+    def refactor_loss(self, X, y=None):
+        """
+    Evaluate loss and gradient for the three-layer convolutional network.
+
+    Input / output: Same API as TwoLayerNet in fc_net.py.
+    """
+        W1, b1 = self.params['W1'], self.params['b1']
+        W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
+        W2, b2 = self.params['W2'], self.params['b2']
+        W3, b3 = self.params['W3'], self.params['b3']
+        W4, b4 = self.params['W4'], self.params['b4']
+
+        # pass conv_param to the forward pass for the convolutional layer
+        filter_size = W1.shape[2]
+        conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2 }
+        conv_param2 = {'stride': 1, 'pad': 0 }
+        # pass pool_param to the forward pass for the max-pooling layer
+        pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
+
+        scores = None
+        ############################################################################
+        # TODO: Implement the forward pass for the three-layer convolutional net,  #
+        # computing the class scores for X and storing them in the scores          #
+        # variable.                                                                #
+        ############################################################################
+
+        out1, cache1 = conv_relu_pool_forward(X, W1, b1, conv_param1, pool_param)
+        # print out1.shape
+
+        (conv_cache, relu_cache, pool_cache) = cache1
+
+        out2, cache2 = conv_relu_pool_forward(out1, W1_2, b1_2, conv_param2, pool_param)
+
+        # print out2.shape
+
+        affine_relu_out, affine_relu_cache = affine_relu_forward(out2, W2, b2)
+
+        # print affine_relu_out.shape
+
+        affine_relu_out2, affine_relu_cache2 = affine_relu_forward(affine_relu_out, W3, b3)
+
+        # print affine_relu_out2.shape
+
+        affine2_out, affine2_cache = affine_forward(affine_relu_out2, W4, b4)
+
+        # print affine2_out.shape
+
+        # print "back_ward ###############################################"
+
+        scores = affine2_out
+
+        ############################################################################
+        #                             END OF YOUR CODE                             #
+        ############################################################################
+
+        if y is None:
+            return scores
+
+        loss, grads = 0, {}
+        ############################################################################
+        # TODO: Implement the backward pass for the three-layer convolutional net, #
+        # storing the loss and gradients in the loss and grads variables. Compute  #
+        # data loss using softmax, and make sure that grads[k] holds the gradients #
+        # for self.params[k]. Don't forget to add L2 regularization!               #
+        ############################################################################
+        loss, dscores = softmax_loss(scores, y)
+        loss += 0.5 * self.reg * (
+            np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']) + np.sum(
+                self.params['W3'] * self.params['W3'])+ np.sum(self.params['W4'] * self.params['W4']) + np.sum(self.params['W1_2'] * self.params['W1_2']) )
+
+        affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
+
+        grads['W4'] = affine2_dw + self.reg * self.params['W4']
+        grads['b4'] = affine2_db
+
+        # print affine2_dx.shape
+
+        affine3_dx, affine3_dw, affine3_db = affine_relu_backward(affine2_dx, affine_relu_cache2)
+
+        # print affine3_dx.shape
+
+        grads['W3'] = affine3_dw + self.reg * self.params['W3']
+        grads['b3'] = affine3_db
+
+        affine1_dx, affine1_dw, affine1_db = affine_relu_backward(affine3_dx, affine_relu_cache)
+        grads['W2'] = affine1_dw + self.reg * self.params['W2']
+        grads['b2'] = affine1_db
+
+        # print affine1_dx.shape
+
+        out1_dout, conv_dw, conv_db = conv_relu_pool_backward_naive(affine1_dx, cache2)
+        grads['W1_2'] = conv_dw + self.reg * self.params['W1_2']
+        grads['b1_2'] = conv_db
+
+        # N_1, C_1, H_1, W_1 = out1_dout.shape
+        # out1_dout_reshape = out1_dout.reshape(N_1, C_1 * H_1 * W_1)
+        # print out1_dout_reshape.shape
+
+        out_dout, w_dw, d_db = conv_relu_pool_backward_naive(out1_dout, cache1)
+
+        grads['W1'] = w_dw + self.reg * self.params['W1']
+        grads['b1'] = d_db
+
+        # print out_dout.shape
 
         ############################################################################
         #                             END OF YOUR CODE                             #

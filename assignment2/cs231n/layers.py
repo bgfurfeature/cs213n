@@ -470,8 +470,12 @@ def conv_backward_naive(dout, cache):
     x, w, b, conv_param, _ = cache
     stride = conv_param['stride']
     pad = conv_param['pad']
+    # print stride
+    # print pad
     N, C, H, W = x.shape
+    # print x.shape
     F, _, HH, WW = w.shape
+    # print w.shape
     _, _, H_out, W_out = dout.shape
     # print "dout_shape"
     # print dout.shape
@@ -500,10 +504,12 @@ def conv_backward_naive(dout, cache):
                     current_x_matrix = x_pad[n, :, i * stride: i * stride + HH, j * stride:j * stride + WW]
                     dw[f] = dw[f] + dout[n, f, i, j] * current_x_matrix  # echo element should be multiply each filter
                     dx_pad[n, :, i * stride: i * stride + HH, j * stride:j * stride + WW] += w[f] * dout[n, f, i, j]
-
-    dx = dx_pad[:, :, 1:H + 1, 1:W + 1]
+    if pad == 0:
+        dx = dx_pad
+    else:
+        dx = dx_pad[:, :, 1:H + 1, 1:W + 1]
     # print "dx_shape"
-    # print dx.shape
+    # print dx_pad.shape
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################

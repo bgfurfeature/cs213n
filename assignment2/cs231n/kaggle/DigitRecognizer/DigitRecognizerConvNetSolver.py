@@ -170,6 +170,29 @@ class Solver(object):
             self.model.params[p] = next_w
             self.optim_configs[p] = next_config
 
+    def refactor_step(self):
+        """
+    Make a single gradient update. This is called by train() and should not
+    be called manually.
+    """
+        # Make a minibatch of training data
+        num_train = self.X_train.shape[0]
+        batch_mask = np.random.choice(num_train, self.batch_size)
+        X_batch = self.X_train[batch_mask]
+        y_batch = self.y_train[batch_mask]
+
+        # Compute loss and gradient
+        loss, grads = self.model.refactor_loss(X_batch, y_batch)
+        self.loss_history.append(loss)
+
+        # Perform a parameter update
+        for p, w in self.model.params.iteritems():  # p:key, w: value
+            dw = grads[p]
+            config = self.optim_configs[p]
+            next_w, next_config = self.update_rule(w, dw, config)  # parameter update rule choice
+            self.model.params[p] = next_w
+            self.optim_configs[p] = next_config
+
     def check_accuracy(self, X, y, num_samples=None, batch_size=100):
         """
     Check accuracy of the model on the provided data.
@@ -210,6 +233,46 @@ class Solver(object):
 
         return acc
 
+    def refactor_check_accuracy(self, X, y, num_samples=None, batch_size=100):
+        """
+    Check accuracy of the model on the provided data.
+
+    Inputs:
+    - X: Array of data, of shape (N, d_1, ..., d_k)
+    - y: Array of labels, of shape (N,)
+    - num_samples: If not None, subsample the data and only test the model
+      on num_samples datapoints.
+    - batch_size: Split X and y into batches of this size to avoid using too
+      much memory.
+
+    Returns:
+    - acc: Scalar giving the fraction of instances that were correctly
+      classified by the model.
+    """
+
+        # Maybe subsample the data
+        N = X.shape[0]
+        if num_samples is not None and N > num_samples:
+            mask = np.random.choice(N, num_samples)  # random select num_samples of x for check acc
+            N = num_samples
+            X = X[mask]
+            y = y[mask]
+
+        # Compute predictions in batches
+        num_batches = N / batch_size
+        if N % batch_size != 0:
+            num_batches += 1
+        y_pred = []
+        for i in xrange(num_batches):
+            start = i * batch_size
+            end = (i + 1) * batch_size
+            scores = self.model.refactor_loss(X[start:end])
+            y_pred.append(np.argmax(scores, axis=1))
+        y_pred = np.hstack(y_pred)  # transform to nparry
+        acc = np.mean(y_pred == y)
+
+        return acc
+
     def predict(self, test):
         """
         predict the test data
@@ -239,7 +302,8 @@ class Solver(object):
         num_iterations = self.num_epochs * iterations_per_epoch
 
         for t in xrange(num_iterations):
-            self._step()
+            # self._step()
+            self.refactor_step()
 
             # Maybe print training loss
             if self.verbose and t % self.print_every == 0:
@@ -259,9 +323,9 @@ class Solver(object):
             first_it = (t == 0)
             last_it = (t == num_iterations + 1)
             if first_it or last_it or epoch_end:
-                train_acc = self.check_accuracy(self.X_train, self.y_train,
+                train_acc = self.refactor_check_accuracy(self.X_train, self.y_train,
                                                 num_samples=1000)
-                val_acc = self.check_accuracy(self.X_val, self.y_val)
+                val_acc = self.refactor_check_accuracy(self.X_val, self.y_val)
                 self.train_acc_history.append(train_acc)
                 self.val_acc_history.append(val_acc)
 
