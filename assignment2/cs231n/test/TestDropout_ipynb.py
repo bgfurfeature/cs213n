@@ -1,12 +1,10 @@
 # Dropout
 # As usual, a bit of setup
 
-import time
-import numpy as np
 import matplotlib.pyplot as plt
-from cs231n.classifiers.fc_net import *
 from cs231n.test.load_data import *
-from cs231n.gradient_check import eval_numerical_gradient, eval_numerical_gradient_array
+
+from cs231n.classifiers.fc_net import *
 from cs231n.solver import Solver
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0) # set default size of plots

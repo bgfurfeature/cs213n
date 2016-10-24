@@ -1,14 +1,9 @@
 # As usual, a bit of setup
-import time
-import numpy as np
 import matplotlib.pyplot as plt
 from cs231n.classifiers.CustomConvNet import *
 from cs231n.test.load_data import *
-from cs231n.gradient_check import eval_numerical_gradient_array, eval_numerical_gradient
-from cs231n.layers import *
+
 from cs231n.fast_layers import *
-from cs231n.solver import Solver
-from cs231n.fast_layers import max_pool_forward_fast, max_pool_backward_fast
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
