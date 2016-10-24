@@ -1,7 +1,10 @@
-F:\python2.7\python.exe E:/github/cs231n/assignment2/cs231n/kaggle/DigitRecognizer/DigitRecognizerCNN.py
-run the following from the cs231n directory and try again:
-python setup.py build_ext --inplace
-You may also need to restart your iPython kernel
+# firstConv -> 28 x 28 x1 with filter 5 x 5 x 6, stride 1, pad 2 transformed to 28 x 28 x 6
+# maxpool -> 28 x 28 x 6 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 6
+# fc_1 -> neuron number 120
+# fc_2 -> neuron number 84
+# out -> classes 10
+use adadelta to update params: 0.98057
+
 (41000L, 1L, 28L, 28L)
 (Iteration 1 / 4100) loss: 2.302661
 (Epoch 0 / 5) train acc: 0.104000; val_acc: 0.104000
