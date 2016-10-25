@@ -1,4 +1,5 @@
 model : conv - relu - 2x2 max pool - affine - relu - affine - softmax  0.97200
+
 (41000L, 1L, 28L, 28L)
 (Iteration 1 / 4100) loss: 2.302933
 (Epoch 0 / 5) train acc: 0.181000; val_acc: 0.189000
