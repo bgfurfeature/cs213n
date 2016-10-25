@@ -1,35 +1,23 @@
 import os
 import numpy as np
 
+class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse", 8: "ship",
+             9: "truck"}
 
-class test(object):
+# save results
+scores = np.array([[0, 1, 2]
+                    ,[3, 4, 5],
+                      [6, 7, 8]])
 
-    def __init__(self):
+y_pred = np.argmax(scores, axis=1)
+print y_pred
+N = y_pred.size
+print N
 
-        self.params = {}
+class_list = []
+for index in xrange(N):
+    pre_class = class_dic[y_pred[index]]
+    class_list.append(pre_class)
 
-        # w1 = np.array([[0, 1, 2], [3, 4, 5]])
-        #
-        # w2 = np.random.normal(0, 1e-2, (7, 1, 2, 2))
-        #
-        # # params = {'w1': 0.9, 'w2': 0.87}
-        # self.params["w1"] = w1.copy()
-        # self.params['w2'] = w2
-        # f = open('model.txt', 'a')
-        # for k, v in self.params.iteritems():
-        #     f.write(k + "=" + str(v) + "\n")
-        # f.close()
-
-    def load_model(self, model_file):
-        f = open(model_file, "r")
-        lines = f.readlines()
-        for item in lines:
-            k, v = item.split("=")
-            self.params[k] = float(v)
-        f.close()
-        print self.params
-
-
-test = test()
-
-# test.load_model("model.txt")
+np.savetxt('submission_cnn.csv', np.c_[range(1, len(scores) + 1), class_list], delimiter=',',
+           header='id,label', comments='', fmt='%s')
