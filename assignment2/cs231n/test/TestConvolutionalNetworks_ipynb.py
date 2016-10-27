@@ -1,7 +1,5 @@
 # As usual, a bit of setup
 import matplotlib.pyplot as plt
-from cs231n.classifiers.CustomConvNet import *
-from cs231n.test.load_data import *
 
 from cs231n.fast_layers import *
 
@@ -192,20 +190,68 @@ def rel_error(x, y):
 #############################################################################
 # Fast layers
 from cs231n.layer_utils import *
-from cs231n.fast_layers import conv_forward_fast, conv_backward_fast
+from cs231n.fast_layers import conv_forward_fast
 from time import time
 
-x = np.random.randn(100, 3, 31, 31)
-w = np.random.randn(25, 3, 3, 3)
-b = np.random.randn(25,)
-dout = np.random.randn(100, 25, 16, 16)
-conv_param = {'stride': 2, 'pad': 1}
+x = np.random.randn(100, 1, 28, 28)
+w1 = np.random.randn(32, 1, 5, 5)
+b1 = np.random.randn(32,)
+w2 = np.random.randn(64, 32, 5, 5)
+b2 = np.random.randn(64,)
+w3 = np.random.randn(64 *7 * 7, 1024)
+b3 = np.random.randn(1024,)
+w4 = np.random.randn(1024, 10)
+b4 = np.random.randn(10,)
+dout = np.random.randn(100, 32, 28, 28)
+dscores = np.random.randn(100, 10)
 
-t0 = time()
-out_naive, cache_naive = conv_forward_naive(x, w, b, conv_param)
-t1 = time()
-out_fast, cache_fast = conv_forward_fast(x, w, b, conv_param)
-t2 = time()
+conv_param = {'stride': 1, 'pad': 2}
+
+# t0 = time()
+# out_naive, cache_naive = conv_forward_naive(x, w, b, conv_param)
+# print out_naive.shape
+# print out_naive
+# t1 = time()
+# out_fast, cache_fast = conv_forward_fast(x, w, b, conv_param)
+# print out_fast.shape
+# print out_fast
+# t2 = time()
+
+# pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
+# out1, cache1 = conv_relu_pool_forward(x, w1, b1, conv_param, pool_param)
+# print out1.shape
+# # print out1
+# print "#############################################################################"
+# out2, cache2 = conv_relu_pool_forward(out1, w2, b2, conv_param, pool_param)
+# print out2.shape
+# # print out2
+# affine_relu_out2, affine_relu_cache2 = affine_relu_forward(out2, w3, b3)
+# print affine_relu_out2.shape
+# # print affine_relu_out2
+# affine2_out, affine2_cache = affine_forward(affine_relu_out2, w4, b4)
+# print affine2_out.shape
+# affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
+# print affine2_dw.shape
+# dx = np.zeros_like(affine2_dw)
+# dx[affine2_dw > 0] = 1
+# print dx.sum()
+# affine3_dx, affine3_dw, affine3_db = affine_relu_backward(affine2_dx, affine_relu_cache2)
+# print "#############################################################################"
+# print affine3_dw.shape
+# dx = np.zeros_like(affine3_dw)
+# dx[affine3_dw > 0] = 1
+# print dx.sum()
+# out1_dout, conv_dw, conv_db = conv_relu_pool_backward_naive(affine3_dx, cache2)
+# print "#############################################################################"
+# print conv_dw.shape
+# dx = np.zeros_like(conv_dw)
+# dx[conv_dw > 0] = 1
+# print dx.sum()
+# out_dout, w_dw, d_db = conv_relu_pool_backward_naive(out1_dout, cache1)
+# print w_dw.shape
+# dx = np.zeros_like(w_dw)
+# dx[w_dw > 0] = 1
+# print dx.sum()
 #
 # print 'Testing conv_forward_fast:'
 # print 'Naive: %fs' % (t1 - t0)
@@ -405,15 +451,15 @@ t2 = time()
 # Check the training-time forward pass by checking means and variances
 # of features both before and after spatial batch normalization
 
-small_data = data['X_train'][:10]
-N, C, H, W = small_data.shape
-print small_data.shape
-
-x_tr = small_data.transpose(0, 3, 2, 1)
-print x_tr.shape
-
-x_reshape = x_tr.reshape((N * H * W, C))
-print x_reshape.shape
+# small_data = data['X_train'][:10]
+# N, C, H, W = small_data.shape
+# print small_data.shape
+#
+# x_tr = small_data.transpose(0, 3, 2, 1)
+# print x_tr.shape
+#
+# x_reshape = x_tr.reshape((N * H * W, C))
+# print x_reshape.shape
 
 # N, C, H, W = 2, 3, 4, 5
 # x = 4 * np.random.randn(N, C, H, W) + 10
