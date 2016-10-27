@@ -138,17 +138,18 @@ class conv_relu_max_pool_affine_relu_affineNet(object):
 
         return loss, grads
 
+    ########################################################################################################################
+    # LeNet try : two convlayer didn't work well, there are something wrong that i am not figured out                      #
+    # firstConv -> 28 x 28 x1 with filter 5 x 5 x 6, stride 1, pad 2 transformed to 28 x 28 x 6                            #
+    # maxpool ->  28 x 28 x 6 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 6                                    #
+    # secondConv -> 14 x 14 x 6 with  filter 5 x 5 x 16, stride 1, pad 0 transformed to 10 x 10 x 6                        #
+    # maxpool -> 10 x 10 x 6 with pool size 2 x 2, stride 2 transformed to 5 x 5 x 6                                       #
+    # fc_1 -> neuron number 120                                                                                            #
+    # fc_2 -> neuron number 84                                                                                             #
+    # out -> classes 10                                                                                                    #
+    #
 
-########################################################################################################################
-# LeNet try : two convlayer didn't work well, there are something wrong that i am not figured out                      #
-# firstConv -> 28 x 28 x1 with filter 5 x 5 x 6, stride 1, pad 2 transformed to 28 x 28 x 6                            #
-# maxpool ->  28 x 28 x 6 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 6                                    #
-# secondConv -> 14 x 14 x 6 with  filter 5 x 5 x 16, stride 1, pad 0 transformed to 10 x 10 x 6                        #
-# maxpool -> 10 x 10 x 6 with pool size 2 x 2, stride 2 transformed to 5 x 5 x 6                                       #
-# fc_1 -> neuron number 120                                                                                            #
-# fc_2 -> neuron number 84                                                                                             #
-# out -> classes 10                                                                                                    #
-                                                                                                                       #
+
 #######################################################################################################################
 # user define layer， whatever you like ，just give me higher-accuracy
 class LeNet(object):
@@ -198,10 +199,10 @@ class LeNet(object):
         self.params['W1'] = np.random.normal(0, weight_scale, (num_filters1, C, filter_size, filter_size))
         self.params['b1'] = np.zeros(num_filters1)
 
-        # self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
-        # self.params['b1_2'] = np.zeros(num_filters2)
-        # self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
-        # self.params['b2'] = np.zeros(hidden_dim1) # for double conv layer setting
+        self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
+        self.params['b1_2'] = np.zeros(num_filters2)
+        self.params['W2_2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
+        self.params['b2_2'] = np.zeros(hidden_dim1)  # for double conv layer setting
 
         self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
         self.params['b2'] = np.zeros(hidden_dim1)
@@ -211,7 +212,6 @@ class LeNet(object):
 
         self.params['W4'] = np.random.normal(0, weight_scale, (hidden_dim2, num_classes))
         self.params['b4'] = np.zeros(num_classes)
-
 
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -227,20 +227,20 @@ class LeNet(object):
     Input / output: Same API as TwoLayerNet in fc_net.py.
     """
         W1, b1 = self.params['W1'], self.params['b1']
-        # W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
         W2, b2 = self.params['W2'], self.params['b2']
         W3, b3 = self.params['W3'], self.params['b3']
         W4, b4 = self.params['W4'], self.params['b4']
 
         # pass conv_param to the forward pass for the convolutional layer
         filter_size = W1.shape[2]
-        conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2 }
-        conv_param2 = {'stride': 1, 'pad': 0 }
+        conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2}
+        conv_param2 = {'stride': 1, 'pad': 0}
 
         # pass pool_param to the forward pass for the max-pooling layer
         pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
 
         scores = None
+
         ############################################################################
         # TODO: Implement the forward pass for the three-layer convolutional net,  #
         # computing the class scores for X and storing them in the scores          #
@@ -250,11 +250,8 @@ class LeNet(object):
         # conv_out, conv_cache = conv_forward_im2col(X, W1, b1, conv_param)  # need to set right env
         conv_out, conv_cache = conv_forward_fast(X, W1, b1, conv_param1)
         relu1_out, relu1_cache = relu_forward(conv_out)
-        pool_out, pool_cache = max_pool_forward_fast(relu1_out, pool_param)  # can not use fast method because of back_ward method, backward method between two convLayer can not be execute correctly
-
-        # conv2_out,conv2_cache = conv_forward_fast(pool_out, W1_2, b1_2, conv_param2)
-        # relu2_out, relu2_cache = relu_forward(conv2_out)
-        # pool2_out, pool2_cache = max_pool_forward_fast(relu2_out, pool_param)
+        pool_out, pool_cache = max_pool_forward_fast(relu1_out,
+                                                     pool_param)  # can not use fast method because of back_ward method, backward method between two convLayer can not be execute correctly
 
         affine_relu_out, affine_relu_cache = affine_relu_forward(pool_out, W2, b2)
         affine_relu_out2, affine_relu_cache2 = affine_relu_forward(affine_relu_out, W3, b3)
@@ -277,10 +274,14 @@ class LeNet(object):
         # data loss using softmax, and make sure that grads[k] holds the gradients #
         # for self.params[k]. Don't forget to add L2 regularization!               #
         ############################################################################
+
         loss, dscores = softmax_loss(scores, y)
-        loss += 0.5 * self.reg * (
-            np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']) + np.sum(
-                self.params['W3'] * self.params['W3'])+ np.sum(self.params['W4'] * self.params['W4'])) # + np.sum(self.params['W1_2'] * self.params['W1_2']) )
+
+        loss += 0.5 * self.reg * (np.sum(
+            self.params['W1'] * self.params['W1']) + np.sum(
+            self.params['W2'] * self.params['W2']) + np.sum(
+            self.params['W3'] * self.params['W3']) + np.sum(
+            self.params['W4'] * self.params['W4']))  # + np.sum(self.params['W1_2'] * self.params['W1_2']) )
 
         affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
         grads['W4'] = affine2_dw + self.reg * self.params['W4']
@@ -295,13 +296,6 @@ class LeNet(object):
         grads['W2'] = affine1_dw + self.reg * self.params['W2']
         grads['b2'] = affine1_db
 
-        # pool_dx = max_pool_backward_fast(affine1_dx, pool2_cache)
-        # relu_dx = relu_backward(pool_dx, relu2_cache)
-        # # conv_dx, conv_dw, conv_db = conv_backward_im2col(relu_dx, conv_cache)  # need to set right env
-        # conv_dx, conv_dw, conv_db = conv_backward_naive(relu_dx, conv2_cache)
-        # grads['W1_2'] = conv_dw + self.reg * self.params['W1_2']
-        # grads['b1_2'] = conv_db
-
         pool2_dx = max_pool_backward_fast(affine1_dx, pool_cache)
         relu2_dx = relu_backward(pool2_dx, relu1_cache)
         # conv_dx, conv_dw, conv_db = conv_backward_im2col(relu_dx, conv_cache)  # need to set right env
@@ -315,23 +309,25 @@ class LeNet(object):
 
         return loss, grads
 
-    # refactor fast_ward and backward method for simplify
     def refactor_loss(self, X, y=None):
         """
-    Evaluate loss and gradient for the three-layer convolutional network.
+         refactor fast_ward and backward method for simplify
+         how to know where is wrong with the network? how to check the dead neurons ?
+         Evaluate loss and gradient for the three-layer convolutional network.
+         Input / output: Same API as TwoLayerNet in fc_net.py.
 
-    Input / output: Same API as TwoLayerNet in fc_net.py.
-    """
+         :param y:
+        """
         W1, b1 = self.params['W1'], self.params['b1']
         W1_2, b1_2 = self.params['W1_2'], self.params['b1_2']
-        W2, b2 = self.params['W2'], self.params['b2']
+        W2_2, b2_2 = self.params['W2_2'], self.params['b2_2']
         W3, b3 = self.params['W3'], self.params['b3']
         W4, b4 = self.params['W4'], self.params['b4']
 
         # pass conv_param to the forward pass for the convolutional layer
         filter_size = W1.shape[2]
-        conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2 }
-        conv_param2 = {'stride': 1, 'pad': 0 }
+        conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2}
+        conv_param2 = {'stride': 1, 'pad': 0}
         # pass pool_param to the forward pass for the max-pooling layer
         pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
 
@@ -345,13 +341,11 @@ class LeNet(object):
         out1, cache1 = conv_relu_pool_forward(X, W1, b1, conv_param1, pool_param)
         # print out1.shape
 
-        (conv_cache, relu_cache, pool_cache) = cache1
-
         out2, cache2 = conv_relu_pool_forward(out1, W1_2, b1_2, conv_param2, pool_param)
 
         # print out2.shape
 
-        affine_relu_out, affine_relu_cache = affine_relu_forward(out2, W2, b2)
+        affine_relu_out, affine_relu_cache = affine_relu_forward(out2, W2_2, W2_2)
 
         # print affine_relu_out.shape
 
@@ -381,10 +375,15 @@ class LeNet(object):
         # data loss using softmax, and make sure that grads[k] holds the gradients #
         # for self.params[k]. Don't forget to add L2 regularization!               #
         ############################################################################
+
         loss, dscores = softmax_loss(scores, y)
-        loss += 0.5 * self.reg * (
-            np.sum(self.params['W1'] * self.params['W1']) + np.sum(self.params['W2'] * self.params['W2']) + np.sum(
-                self.params['W3'] * self.params['W3'])+ np.sum(self.params['W4'] * self.params['W4']) + np.sum(self.params['W1_2'] * self.params['W1_2']) )
+
+        loss += 0.5 * self.reg * (np.sum(
+            self.params['W1'] * self.params['W1']) + np.sum(
+            self.params['W2_2'] * self.params['W2_2']) + np.sum(
+            self.params['W3'] * self.params['W3']) + np.sum(
+            self.params['W4'] * self.params['W4']) + np.sum(
+            self.params['W1_2'] * self.params['W1_2']))
 
         affine2_dx, affine2_dw, affine2_db = affine_backward(dscores, affine2_cache)
 
@@ -401,18 +400,14 @@ class LeNet(object):
         grads['b3'] = affine3_db
 
         affine1_dx, affine1_dw, affine1_db = affine_relu_backward(affine3_dx, affine_relu_cache)
-        grads['W2'] = affine1_dw + self.reg * self.params['W2']
-        grads['b2'] = affine1_db
+        grads['W2_2'] = affine1_dw + self.reg * self.params['W2_2']
+        grads['W2_2'] = affine1_db
 
         # print affine1_dx.shape
 
         out1_dout, conv_dw, conv_db = conv_relu_pool_backward_naive(affine1_dx, cache2)
         grads['W1_2'] = conv_dw + self.reg * self.params['W1_2']
         grads['b1_2'] = conv_db
-
-        # N_1, C_1, H_1, W_1 = out1_dout.shape
-        # out1_dout_reshape = out1_dout.reshape(N_1, C_1 * H_1 * W_1)
-        # print out1_dout_reshape.shape
 
         out_dout, w_dw, d_db = conv_relu_pool_backward_naive(out1_dout, cache1)
 
