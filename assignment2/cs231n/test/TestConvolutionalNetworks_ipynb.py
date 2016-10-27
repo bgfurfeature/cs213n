@@ -21,9 +21,10 @@ def rel_error(x, y):
 #############################################################################
 # Load the (preprocessed) CIFAR10 data.
 
-data = get_CIFAR10_data()
-for k, v in data.iteritems():
-    print '%s: ' % k, v.shape
+# data = get_CIFAR10_data()
+# for k, v in data.iteritems():
+#     print '%s: ' % k, v.shape
+
 #############################################################################
 # Convolution: Naive forward pass
 
@@ -189,22 +190,22 @@ for k, v in data.iteritems():
 # print 'dx error: ', rel_error(dx, dx_num)
 
 #############################################################################
-# Fast layers  - not test successfully
+# Fast layers
+from cs231n.layer_utils import *
+from cs231n.fast_layers import conv_forward_fast, conv_backward_fast
+from time import time
 
-# from cs231n.fast_layers import conv_forward_fast, conv_backward_fast
-# from time import time
-#
-# x = np.random.randn(100, 3, 31, 31)
-# w = np.random.randn(25, 3, 3, 3)
-# b = np.random.randn(25,)
-# dout = np.random.randn(100, 25, 16, 16)
-# conv_param = {'stride': 2, 'pad': 1}
-#
-# t0 = time()
-# out_naive, cache_naive = conv_forward_naive(x, w, b, conv_param)
-# t1 = time()
-# out_fast, cache_fast = conv_forward_fast(x, w, b, conv_param)
-# t2 = time()
+x = np.random.randn(100, 3, 31, 31)
+w = np.random.randn(25, 3, 3, 3)
+b = np.random.randn(25,)
+dout = np.random.randn(100, 25, 16, 16)
+conv_param = {'stride': 2, 'pad': 1}
+
+t0 = time()
+out_naive, cache_naive = conv_forward_naive(x, w, b, conv_param)
+t1 = time()
+out_fast, cache_fast = conv_forward_fast(x, w, b, conv_param)
+t2 = time()
 #
 # print 'Testing conv_forward_fast:'
 # print 'Naive: %fs' % (t1 - t0)
