@@ -140,12 +140,13 @@ class conv_relu_max_pool_affine_relu_affineNet(object):
 
     ########################################################################################################################
     # LeNet try : two convlayer didn't work well, there are something wrong that i am not figured out                      #
-    # firstConv -> 28 x 28 x1 with filter 5 x 5 x 6, stride 1, pad 2 transformed to 28 x 28 x 6                            #
-    # maxpool ->  28 x 28 x 6 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 6                                    #
-    # secondConv -> 14 x 14 x 6 with  filter 5 x 5 x 16, stride 1, pad 0 transformed to 10 x 10 x 6                        #
-    # maxpool -> 10 x 10 x 6 with pool size 2 x 2, stride 2 transformed to 5 x 5 x 6                                       #
-    # fc_1 -> neuron number 120                                                                                            #
-    # fc_2 -> neuron number 84                                                                                             #
+    # firstConv -> 28 x 28 x1 with filter 5 x 5 x 32, stride 1, pad 2 transformed to 28 x 28 x 32                          #
+    # maxpool ->  28 x 28 x 32 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 32                                  #
+    # secondConv -> 14 x 14 x 32 with  filter 5 x 5 x 64, stride 1, pad 2 transformed to 14 x 14 x 64                        #
+    # maxpool -> 14 x 14 x 64 with pool size 2 x 2, stride 2 transformed to 7 x 7 x 64                                       #
+    # fc_1 -> neuron number 1024
+    # droup out 0.5                                                                                          #
+    # fc_2 -> neuron number 84 # abandon                                                                                            #
     # out -> classes 10                                                                                                    #
     #
 
@@ -163,8 +164,8 @@ class LeNet(object):
   channels.
   """
 
-    def __init__(self, input_dim=(1, 28, 28), num_filters1=6, num_filters2=6, filter_size=5,
-                 hidden_dim1=120, hidden_dim2=84, num_classes=10, weight_scale=1e-3, reg=0.0,
+    def __init__(self, input_dim=(1, 28, 28), num_filters1=32, num_filters2=64, filter_size=5,
+                 hidden_dim1=1024, hidden_dim2=84, num_classes=10, weight_scale=1e-3, reg=0.0,
                  dtype=np.float32):
         """
     Initialize a new network.
@@ -201,7 +202,7 @@ class LeNet(object):
 
         self.params['W1_2'] = np.random.normal(0, weight_scale, (num_filters2, num_filters1, filter_size, filter_size))
         self.params['b1_2'] = np.zeros(num_filters2)
-        self.params['W2_2'] = np.random.normal(0, weight_scale, (num_filters2 * 10 / 2 * 10 / 2, hidden_dim1))
+        self.params['W2_2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
         self.params['b2_2'] = np.zeros(hidden_dim1)  # for double conv layer setting
 
         self.params['W2'] = np.random.normal(0, weight_scale, (num_filters2 * H / 2 * W / 2, hidden_dim1))
@@ -234,7 +235,6 @@ class LeNet(object):
         # pass conv_param to the forward pass for the convolutional layer
         filter_size = W1.shape[2]
         conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2}
-        conv_param2 = {'stride': 1, 'pad': 0}
 
         # pass pool_param to the forward pass for the max-pooling layer
         pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
@@ -327,7 +327,6 @@ class LeNet(object):
         # pass conv_param to the forward pass for the convolutional layer
         filter_size = W1.shape[2]
         conv_param1 = {'stride': 1, 'pad': (filter_size - 1) / 2}
-        conv_param2 = {'stride': 1, 'pad': 0}
         # pass pool_param to the forward pass for the max-pooling layer
         pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
 
@@ -341,7 +340,7 @@ class LeNet(object):
         out1, cache1 = conv_relu_pool_forward(X, W1, b1, conv_param1, pool_param)
         # print out1.shape
 
-        out2, cache2 = conv_relu_pool_forward(out1, W1_2, b1_2, conv_param2, pool_param)
+        out2, cache2 = conv_relu_pool_forward(out1, W1_2, b1_2, conv_param1, pool_param)
 
         # print out2.shape
 
