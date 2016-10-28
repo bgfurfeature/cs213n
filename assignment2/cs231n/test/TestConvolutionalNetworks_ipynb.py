@@ -253,6 +253,7 @@ conv_param = {'stride': 1, 'pad': 2}
 # dx[w_dw > 0] = 1
 # print dx.sum()
 #
+
 # print 'Testing conv_forward_fast:'
 # print 'Naive: %fs' % (t1 - t0)
 # print 'Fast: %fs' % (t2 - t1)
