@@ -49,9 +49,6 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000):
     mask = range(num_training)
     X_train = X_train[mask]
     y_train = y_train[mask]
-    mask = range(num_test)
-    X_test = X_test[mask]
-    y_test = y_test[mask]
 
     # Normalize the data: subtract the mean image, same mean pls
     mean_image = np.mean(X_train, axis=0)
