@@ -1,6 +1,6 @@
 import os
 import numpy as np
-
+from cs231n.kaggle.CIFAR10.load_data import *
 # class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse", 8: "ship",
 #              9: "truck"}
 #
@@ -21,3 +21,7 @@ import numpy as np
 #
 # np.savetxt('submission_cnn.csv', np.c_[range(1, len(scores) + 1), class_list], delimiter=',',
 #            header='id,label', comments='', fmt='%s')
+
+
+res = dense_to_one_hot(9, 10)
+print res
