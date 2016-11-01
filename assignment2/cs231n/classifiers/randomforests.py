@@ -103,10 +103,14 @@ class RandomForestsClassifier:
                     print "bestCriteria:" + str(bestCriteria) + " , best gini is:" + str(bestGain)
                     bestSets = (set1, set2)
         if bestGain > 0:
+            print "create trueBranch child tree!!"
             trueBranch = self.buildTree(bestSets[0])
+            print "create falseBranch child tree!!"
             falseBranch = self.buildTree(bestSets[1])
+            print "return node!!"
             return node(col=bestCriteria[0], value=bestCriteria[1], trueBranch=trueBranch, falseBranch=falseBranch)
         else:
+            print "saving result for node!!"
             return node(results=self.uniqueCounts(samples))  # get class
 
     # show tree
