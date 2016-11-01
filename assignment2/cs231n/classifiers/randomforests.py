@@ -19,6 +19,7 @@ class node:
         self.falseBranch = falseBranch
 
     def getLabel(self):
+        global label
         if self.results is None:
             return None
         else:
