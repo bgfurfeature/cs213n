@@ -144,9 +144,8 @@ class conv_relu_max_pool_affine_relu_affineNet(object):
     # maxpool ->  28 x 28 x 32 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 32                                  #
     # secondConv -> 14 x 14 x 32 with  filter 5 x 5 x 64, stride 1, pad 2 transformed to 14 x 14 x 64                        #
     # maxpool -> 14 x 14 x 64 with pool size 2 x 2, stride 2 transformed to 7 x 7 x 64                                       #
-    # fc_1 -> neuron number 1024
-    # droup out 0.5                                                                                          #
-    # fc_2 -> neuron number 84 # abandon                                                                                            #
+    # fc_1 -> neuron number 1024                                                                                                    #
+    # fc_2 -> neuron number 84 # abandon                                                                               #
     # out -> classes 10                                                                                                    #
     #
 
