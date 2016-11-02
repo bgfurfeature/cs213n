@@ -139,6 +139,7 @@ correct_prediction = tf.equal(predict_function, tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  # Casts bool to a new type tf.float32
 # define all is over!!
 # start to run
+
 sess.run(tf.initialize_all_variables())  # init all variables
 
 for i in range(20000):
