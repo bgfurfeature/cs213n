@@ -1,29 +1,40 @@
 """
- test random forest
+ test random forest using iris data set
 """
-
+import pandas as pd
+import  numpy as np
 from cs231n.classifiers.randomforests import *
 
 data = []
+data_dir = "E:/github/cs231n/assignment2/cs231n/datasets/iris/"
+iris_training = "iris_training.csv"
+iris_test = "iris_test.csv"
 
-for i in [0, 1]:
-    for j in [0, 1]:
-        for k in [0, 1]:
-            for m in [0, 1]:
-                for v in ["yes", "no"]:
-                    data.append([i, j, k, m, v])
-# for i in [0, 1]:
-#     for j in [0, 1]:
-#         for v in ["yes", "no"]:
-#             data.append([i, j, 1, 0, v])
-#             data.append([i, 0, 1, j, v])
+training_data = pd.read_csv(data_dir + iris_training)
+test_data = pd.read_csv(data_dir + iris_test)
+test_label = test_data[[4]].values.ravel()
+train = list(training_data.iloc[:, 0:5].values)
+train = list(train)
 
-rowRange = range(32)
-training_data = [data[i] for i in rowRange[0:22]]
-test_data = [data[i] for i in rowRange[22:32]]
-print training_data
+test = list(test_data.iloc[:, 0:5].values)
+test = list(test)
 
-classifier = RandomForestsClassifier(n_bootstrapSamples=1)
-classifier.fit(training_data)
-for tree in classifier.list_tree:
-    classifier.printTree(tree)
+# training data
+classifier = RandomForestsClassifier(n_bootstrapSamples=50)
+classifier.fit(train)
+
+resList = []
+count = 0
+for data in test:
+    res = classifier.predict_randomForests(data)
+    label = data[4]
+    if label == res:
+        count += 1
+    resList.append(res)
+total = len(test_data)
+print resList
+predict_and_label = np.equal(np.array(test_label), np.array(resList))
+correct = [data for data in predict_and_label if data]
+num = len(correct)
+print ("acc:%0.04f" % (count / (total * 1.0)))
+print ("acc:%0.04f" % (num / (total * 1.0)))

@@ -1,6 +1,9 @@
 # coding=utf-8
 """
 randon forest
+
+data format: [[0,0,0,0,class1],[0,0,0,1,class2]....]
+the last col is class
 """
 from __future__ import division
 import numpy as np
