@@ -107,8 +107,8 @@ y_conv = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 # to do is to set the feed_dict
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
 train_step = tf.train.AdamOptimizer(1e-3).minimize(cross_entropy)
-correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 predict_function = tf.argmax(y_conv, 1)
+correct_prediction = tf.equal(predict_function, tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  # Casts bool to a new type tf.float32
 # define all is over!!
 # start to run
