@@ -1,15 +1,16 @@
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
+import numpy as np
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 sess = tf.InteractiveSession()
 
-x = tf.placeholder(tf.float32, shape=[None, 784])
+x = tf.placeholder(tf.float32, shape=[None, 784])  # None means whatever size you like
 y_ = tf.placeholder(tf.float32, shape=[None, 10])
 
-W = tf.Variable(tf.zeros([784, 10]))
-b = tf.Variable(tf.zeros([10]))
+W = tf.Variable(tf.random_normal(shape=[784, 10]), name='W1')  #
+b = tf.Variable(tf.zeros([10]), name='b1')
 
 
 ########################################################################################################################
@@ -34,22 +35,35 @@ b = tf.Variable(tf.zeros([10]))
 # print(accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
 
 #######################################################################################################################
-#  convolution net work
-
+#  convolution net work - same as LeNet
+# LeNet try : two convlayer didn't work well, there are something wrong that i am not figured out                      #
+# firstConv -> 28 x 28 x1 with filter 5 x 5 x 32, stride 1, pad 2 transformed to 28 x 28 x 32                          #
+# maxpool ->  28 x 28 x 32 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 32                                  #
+# secondConv -> 14 x 14 x 32 with  filter 5 x 5 x 64, stride 1, pad 2 transformed to 14 x 14 x 64
+# maxpool -> 14 x 14 x 64 with pool size 2 x 2, stride 2 transformed to 7 x 7 x 64
+# fc_1 -> neuron number 1024
+# fc_2 -> neuron number 84 # abandon
+# dropout 0.5
+# out -> classes 10
+#
+# init weight
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
     return tf.Variable(initial)
 
 
+# init bias
 def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
 
 
+# define convolution layer
 def conv2d(x, W):
-    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')  # Number -  Height - Weight - Channels
 
 
+# define pooling layer
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
@@ -75,30 +89,40 @@ b_fc1 = bias_variable([1024])
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
+W_fc2 = weight_variable([1024, 84])
+b_fc2 = bias_variable([84])
+
+h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2)
+
 keep_prob = tf.placeholder(tf.float32)
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
 
-W_fc2 = weight_variable([1024, 10])
-b_fc2 = bias_variable([10])
+W_fc3 = weight_variable([84, 10])
+b_fc3 = bias_variable([10])
 
-y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+y_conv = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
 ########################################################################################################################
-
+# define cal function for this model: the predict val is stored in y_conv,the correct label is stored in y_, all you need
+# to do is to set the feed_dict
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(1e-3).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-sess.run(tf.initialize_all_variables())
+predict_function = tf.argmax(y_conv, 1)
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  # Casts bool to a new type tf.float32
+# define all is over!!
+# start to run
+sess.run(tf.initialize_all_variables())  # init all variables
 
 for i in range(20000):
     batch = mnist.train.next_batch(50)
     if i % 100 == 0:
-        train_accuracy = accuracy.eval(feed_dict={
-            x: batch[0], y_: batch[1], keep_prob: 1.0})
+        train_accuracy = accuracy.eval(feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
         print("step %d, training accuracy %g" % (i, train_accuracy))
     train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-print("test accuracy %g" % accuracy.eval(feed_dict={
-    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+print("test accuracy %g" % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+
+predict_result = predict_function.eval(feed_dict={x: mnist.test.images, keep_prob: 1.0})
+# save results
+np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(mnist.test.images) + 1), predict_result],delimiter=',', header='id,label', comments='', fmt='%s')
