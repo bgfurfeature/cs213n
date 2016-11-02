@@ -1,7 +1,7 @@
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import numpy as np
-import pandas as pd
+# import pandas as pd
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
@@ -10,26 +10,26 @@ print(len(mnist.test.images))
 
 
 # Load the (preprocessed) data; csv file
-def load_data(training_file, test_file):
-
-    data_set = pd.read_csv(training_file)
-    train_target = data_set[[0]].values.ravel()
-    train = data_set.iloc[:, 1:].values
-    test = pd.read_csv(test_file).values
-
-    # convert to array, specify data type, and reshape
-    X_train = np.array(train).reshape(42000, 1, 28, 28).astype(np.uint8)
-    y_train = np.array(train_target).astype(np.uint8)
-    # X_train = np.array(train).reshape((-1, 1, 28, 28)).astype(np.uint8)
-    test = np.array(test).reshape(28000, 1, 28, 28).astype(np.uint8)
-
-    return {
-        'X_train': X_train, 'y_train': y_train,
-        'X_test': test
-    }
-
-
-data = load_data("", "")
+# def load_data(training_file, test_file):
+#
+#     data_set = pd.read_csv(training_file)
+#     train_target = data_set[[0]].values.ravel()
+#     train = data_set.iloc[:, 1:].values
+#     test = pd.read_csv(test_file).values
+#
+#     # convert to array, specify data type, and reshape
+#     X_train = np.array(train).reshape(42000, 1, 28, 28).astype(np.uint8)
+#     y_train = np.array(train_target).astype(np.uint8)
+#     # X_train = np.array(train).reshape((-1, 1, 28, 28)).astype(np.uint8)
+#     test = np.array(test).reshape(28000, 1, 28, 28).astype(np.uint8)
+#
+#     return {
+#         'X_train': X_train, 'y_train': y_train,
+#         'X_test': test
+#     }
+#
+#
+# data = load_data("", "")
 
 sess = tf.InteractiveSession()
 
@@ -150,7 +150,7 @@ for i in range(20000):
 
 print("test accuracy %g" % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
-predict_result = predict_function.eval(feed_dict={x: data["X_test"], keep_prob: 1.0})
+predict_result = predict_function.eval(feed_dict={x: mnist.test.images, keep_prob: 1.0})
 # save results
-np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(data["X_test"]) + 1), predict_result], delimiter=',',
+np.savetxt('LeNet_cnn.csv', np.c_[range(1, len( mnist.test.images + 1)), predict_result], delimiter=',',
            header='id,label', comments='', fmt='%s')
