@@ -17,10 +17,10 @@ def load_data(training_file, test_file):
     test = pd.read_csv(test_file).values
 
     # convert to array, specify data type, and reshape
-    X_train = np.array(train).reshape(42000, 1, 28, 28).astype(np.uint8)
+    X_train = np.array(train).reshape(42000, 28 * 28).astype(np.uint8)
     y_train = np.array(train_target).astype(np.uint8)
     # X_train = np.array(train).reshape((-1, 1, 28, 28)).astype(np.uint8)
-    test = np.array(test).reshape(28000, 1, 28, 28).astype(np.uint8)
+    test = np.array(test).reshape(28000, 28 * 28).astype(np.uint8)
 
     return {
         'X_train': X_train, 'y_train': y_train,
@@ -32,8 +32,8 @@ data_set_home='/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/digtialRecogn
 
 data = load_data(data_set_home + "train.csv", data_set_home + "test.csv")
 
-train_data = data['X_train']
-test_data = data['X_test']
+train_data = data['X_train']  # 42000
+test_data = data['X_test']  # 28000
 print "train_data length: %d" % len(train_data)
 print "test_data length: %d" % len(test_data)
 
