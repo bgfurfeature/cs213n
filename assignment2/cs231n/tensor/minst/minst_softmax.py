@@ -5,6 +5,7 @@ import numpy as np
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
+
 print(len(mnist.train.images))
 print(len(mnist.test.images))
 
