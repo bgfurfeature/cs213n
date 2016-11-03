@@ -18,6 +18,15 @@ class Tree:
         self.root.trueBranch = left
         self.root.falseBranch = right
 
+    def data_format(self, data):
+        result_dic = {}
+        data_list = data.split(',')
+        for d in data_list:
+            k, v = d.split('=')
+            if k == 'results':
+                result_dic = v
+                print result_dic
+
     def construct_tree(self, pre_order, mid_order):
         # 忽略参数合法性判断
         if len(pre_order) == 0:
@@ -67,21 +76,21 @@ class RandomForestsClassifier:
 
     def order(self, tree):
         if tree.results is not None:
-             print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+             print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(tree.trueBranch)+ '|falseBranch=' + str(tree.falseBranch)
              return
         self.order(tree.trueBranch)
         if tree.results is not None:
-            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(tree.trueBranch)+ '|falseBranch=' + str(tree.falseBranch)
         else:
-            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(None)+ '|falseBranch=' + str(None)
         self.order(tree.falseBranch)
 
     def pre_order(self, tree):
         if tree.results is not None:
-            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(tree.trueBranch)+ '|falseBranch=' + str(tree.falseBranch)
             return
         else:
-            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(None)+ '|falseBranch=' + str(None)
         self.pre_order(tree.trueBranch)
         self.pre_order(tree.falseBranch)
 
@@ -168,7 +177,7 @@ class RandomForestsClassifier:
         if tree.results is not None:
             print str(tree.results)
         else:
-            print "col:" + str(tree.col) + ',' + "feature:" + str(tree.value) + ' ?'
+            print "col:" + str(tree.col) + '，' + "feature:" + str(tree.value) + ' ?'
             print indent + 'T->',
             self.printTree(tree.trueBranch, indent + '  ')
             print indent + 'F->',
