@@ -21,7 +21,3 @@ from cs231n.kaggle.CIFAR10.load_data import *
 #
 # np.savetxt('submission_cnn.csv', np.c_[range(1, len(scores) + 1), class_list], delimiter=',',
 #            header='id,label', comments='', fmt='%s')
-
-
-res = dense_to_one_hot(9, 10)
-print res

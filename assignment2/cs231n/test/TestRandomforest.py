@@ -38,5 +38,7 @@ correct = [data for data in predict_and_label if data]
 num = len(correct)
 print ("acc:%0.04f" % (count / (total * 1.0)))
 print ("acc:%0.04f" % (num / (total * 1.0)))
+classifier.printTree(classifier.list_tree[0])
+classifier.order(classifier.list_tree[0])
 
 # Q: How to save the model random forest

@@ -10,11 +10,36 @@ import numpy as np
 import math
 
 
+# coding: utf-8
+class Tree:
+
+    def __init__(self, vertex, left, right):
+        self.root = vertex
+        self.root.trueBranch = left
+        self.root.falseBranch = right
+
+    def construct_tree(self, pre_order, mid_order):
+        # 忽略参数合法性判断
+        if len(pre_order) == 0:
+            return None
+        # 前序遍历的第一个结点一定是根结点
+        root_data = pre_order[0]
+        root_data = node(root_data)
+        for i in range(0, len(mid_order)):
+            vertex = node(mid_order[i])
+            if vertex == root_data:
+                break
+        # 递归构造左子树和右子树
+        left = self.construct_tree(pre_order[1: 1 + i], mid_order[:i])
+        right = self.construct_tree(pre_order[1 + i:], mid_order[i + 1:])
+        return Tree(root_data, left, right)
+
 class node:
     """
      save dt structure for predict
     """
-    def __init__(self, col=-1, value=None, results=None, trueBranch=None, falseBranch=None):
+
+    def __init__(self, col=-1, results=None, value=None, trueBranch=None, falseBranch=None):
         self.col = col
         self.value = value
         self.results = results
@@ -35,11 +60,31 @@ class node:
 
 
 class RandomForestsClassifier:
-
     """
     classifier = randomforest.RandomForestsClassifier(n_bootstrapSamples=10)
     classifier.fit(training_data)
     """
+
+    def order(self, tree):
+        if tree.results is not None:
+             print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+             return
+        self.order(tree.trueBranch)
+        if tree.results is not None:
+            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+        else:
+            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+        self.order(tree.falseBranch)
+
+    def pre_order(self, tree):
+        if tree.results is not None:
+            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+            return
+        else:
+            print "col:" + str(tree.col) + ',' + "value=" + str(tree.value) + ',results='+ str(tree.results)+ ',trueBranch=' + str(tree.trueBranch)+ ',falseBranch=' + str(tree.falseBranch)
+        self.pre_order(tree.trueBranch)
+        self.pre_order(tree.falseBranch)
+
     def __init__(self, n_bootstrapSamples=20):
         self.n_bootstrapSamples = n_bootstrapSamples
         self.list_tree = []
@@ -100,7 +145,8 @@ class RandomForestsClassifier:
                 # according to feature divied
                 dividGini = (len(set1) * self.giniEstimate(set1) + len(set2) * self.giniEstimate(set2)) / len(samples)
                 gain = currentGini - dividGini
-                print "col:" + str(col) + " , value:" + str(value) + " , dividedGini:" + str(dividGini) + " , gini lower result is:" + str(gain)
+                print "col:" + str(col) + " , value:" + str(value) + " , dividedGini:" + str(
+                    dividGini) + " , gini lower result is:" + str(gain)
                 if gain > bestGain and len(set1) > 0 and len(set2) > 0:
                     bestGain = gain
                     bestCriteria = (col, value)
