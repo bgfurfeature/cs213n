@@ -157,7 +157,16 @@ for i in range(20001):
 
 print("test accuracy %g" % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
-predict_result = predict_function.eval(feed_dict={x: test_data, keep_prob: 1.0})
+BATCH_SIZE = 50
+
+# predict test set
+# predicted_lables =  predict_function.eval(feed_dict={x: test_data, keep_prob: 1.0})
+
+# using batches is more resource efficient
+predicted_lables = np.zeros(test_data.shape[0])
+for i in range(0,test_data.shape[0]//BATCH_SIZE):
+    predicted_lables[i * BATCH_SIZE : (i+1) * BATCH_SIZE] = predict_function.eval(feed_dict={x: test_data[i * BATCH_SIZE : (i+1) * BATCH_SIZE],
+                                                                                keep_prob: 1.0})
 # save results
-np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(test_data) + 1), predict_result], delimiter=',',
+np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
            header='id,label', comments='', fmt='%s')
