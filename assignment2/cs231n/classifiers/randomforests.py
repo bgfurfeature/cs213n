@@ -11,37 +11,46 @@ import math
 
 
 # coding: utf-8
-class Tree:
+def data_correct(data, results='results'):
+    final_dic = {}
+    dict_ = data_format(data)
+    results_dic = {}
+    if dict_[results] != 'None':
+        tmp_results_dic = data_format(dict_[results], regx1=',', regx2=':')
+        for k, v in tmp_results_dic.iteritems():
+            results_dic[float(k)] = int(v)
+        dict_[results] = results_dic
+    else:
+        dict_[results] = None
+    for k, v in dict_.iteritems():
+        if k == 'col':
+            final_dic[k] = int(v)
+        elif k == 'value':
+            if v != 'None':
+                final_dic[k] = float(v)
+            else:
+                final_dic[k] = (v)
+        else:
+            final_dic[k] = v
+    return final_dic
 
+
+def data_format(data, regx1='|', regx2='='):
+    dic = {}
+    data_list = data.replace("{", "").replace("}", "").split(regx1)
+
+    for d in data_list:
+        k, v = d.split(regx2)
+        dic[k] = v
+    return dic
+
+
+class Tree:
     def __init__(self, vertex, left, right):
         self.root = vertex
         self.root.trueBranch = left
         self.root.falseBranch = right
 
-    def data_format(self, data):
-        result_dic = {}
-        data_list = data.split(',')
-        for d in data_list:
-            k, v = d.split('=')
-            if k == 'results':
-                result_dic = v
-                print result_dic
-
-    def construct_tree(self, pre_order, mid_order):
-        # 忽略参数合法性判断
-        if len(pre_order) == 0:
-            return None
-        # 前序遍历的第一个结点一定是根结点
-        root_data = pre_order[0]
-        root_data = node(root_data)
-        for i in range(0, len(mid_order)):
-            vertex = node(mid_order[i])
-            if vertex == root_data:
-                break
-        # 递归构造左子树和右子树
-        left = self.construct_tree(pre_order[1: 1 + i], mid_order[:i])
-        right = self.construct_tree(pre_order[1 + i:], mid_order[i + 1:])
-        return Tree(root_data, left, right)
 
 class node:
     """
@@ -74,29 +83,101 @@ class RandomForestsClassifier:
     classifier.fit(training_data)
     """
 
+    def __init__(self, n_bootstrapSamples=20):
+        self.n_bootstrapSamples = n_bootstrapSamples
+        self.list_tree = []
+        self.data_format = []
+        self.var_pre_order = {}
+        self.var_order = {}
+
+    def construct_tree(self, pre_order, mid_order):
+        # 忽略参数合法性判断
+        if len(pre_order) == 0:
+            return None
+        # 前序遍历的第一个结点一定是根结点
+        root_data = pre_order[0]
+        root_node = node(col=(root_data['col']), value=(root_data['value']), results=root_data['results'], trueBranch=root_data['trueBranch'], falseBranch=root_data['falseBranch'])
+
+        for i in range(0, len(mid_order)):
+            vertex = mid_order[i]
+            # min_node = node(col=vertex['col'], value=vertex['value'], results=vertex['results'], trueBranch=vertex['trueBranch'], falseBranch=vertex['falseBranch'])
+            if vertex == root_data:
+                break
+        # 递归构造左子树和右子树
+        left = self.construct_tree(pre_order[1: 1 + i], mid_order[:i])
+        right = self.construct_tree(pre_order[1 + i:], mid_order[i + 1:])
+        root_node.trueBranch = left
+        root_node.falseBranch = right
+        return root_node
+
+    def load_model(self, n_bootstrapSamples=20):
+        tree_list = {}
+        for i in range(n_bootstrapSamples):
+            f = open(str(i), 'r+')
+            lines = f.readlines()
+            pre_order_data = lines[0].split(',')
+            order_data = lines[1].split(',')
+            pre_order = [data_correct(data) for data in pre_order_data if len(data) > 5]
+            order = [data_correct(data) for data in order_data if len(data) > 5]
+            tree_list[i] = self.construct_tree(pre_order, order)
+        return tree_list
+
+    def save_model(self, list_tree={}):
+        for i in range(len(self.list_tree)):
+            self.data_format = []
+            self.pre_order(self.list_tree[i])
+            self.var_pre_order[i] = self.data_format
+
+            self.data_format = []
+            self.order(self.list_tree[i])
+            self.var_order[i] = self.data_format
+
+        for k, v in self.var_pre_order.iteritems():
+            f = file(str(k), 'a+', 1024)
+            for value in v:
+                f.write(value + ",")
+            f.write("\n")
+            f.close()
+        for k, v in self.var_order.iteritems():
+            f = file(str(k), 'a+', 1024)
+            for value in v:
+              f.write(value + ",")
+            f.write("\n")
+            f.close()
+
     def order(self, tree):
         if tree.results is not None:
-             print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(tree.trueBranch)+ '|falseBranch=' + str(tree.falseBranch)
-             return
+            data = "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results=' + str(
+                tree.results) + '|trueBranch=' + str(tree.trueBranch) + '|falseBranch=' + str(tree.falseBranch)
+            self.data_format.append(data)
+            return
         self.order(tree.trueBranch)
         if tree.results is not None:
-            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(tree.trueBranch)+ '|falseBranch=' + str(tree.falseBranch)
+            data = "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results=' + str(
+                tree.results) + '|trueBranch=' + str(tree.trueBranch) + '|falseBranch=' + str(tree.falseBranch)
+            self.data_format.append(data)
+
         else:
-            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(None)+ '|falseBranch=' + str(None)
+            data = "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results=' + str(
+                tree.results) + '|trueBranch=' + str(None) + '|falseBranch=' + str(None)
+            self.data_format.append(data)
+
         self.order(tree.falseBranch)
 
     def pre_order(self, tree):
         if tree.results is not None:
-            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(tree.trueBranch)+ '|falseBranch=' + str(tree.falseBranch)
+            data = "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results=' + str(
+                tree.results) + '|trueBranch=' + str(tree.trueBranch) + '|falseBranch=' + str(tree.falseBranch)
+            self.data_format.append(data)
+
             return
         else:
-            print "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results='+ str(tree.results)+ '|trueBranch=' + str(None)+ '|falseBranch=' + str(None)
+            data = "col=" + str(tree.col) + '|' + "value=" + str(tree.value) + '|results=' + str(
+                tree.results) + '|trueBranch=' + str(None) + '|falseBranch=' + str(None)
+            self.data_format.append(data)
+
         self.pre_order(tree.trueBranch)
         self.pre_order(tree.falseBranch)
-
-    def __init__(self, n_bootstrapSamples=20):
-        self.n_bootstrapSamples = n_bootstrapSamples
-        self.list_tree = []
 
     def divideSet(self, samples, column, value):
 

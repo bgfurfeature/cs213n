@@ -53,3 +53,9 @@ import matplotlib.pyplot as plt
 #
 # plt.show()
 
+
+# data = "col=-1|value=None|results={1.0: 2}|trueBranch=None|falseBranch=None"
+# res = node(data_correct(data))
+# print  res.col
+from cs231n.classifiers.randomforests import *
+
