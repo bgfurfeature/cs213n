@@ -33,6 +33,7 @@ data_set_home='/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/digtialRecogn
 data = load_data(data_set_home + "train.csv", data_set_home + "test.csv")
 
 train_data = data['X_train']  # 42000
+train_label = data['y_train']
 test_data = data['X_test']  # 28000
 print "train_data length: %d" % len(train_data)
 print "test_data length: %d" % len(test_data)
@@ -139,7 +140,7 @@ y_conv = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 # define cal function for this model: the predict val is stored in y_conv,the correct label is stored in y_, all you need
 # to do is to set the feed_dict
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
-train_step = tf.train.AdamOptimizer(1e-3).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 predict_function = tf.argmax(y_conv, 1)
 correct_prediction = tf.equal(predict_function, tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  # Casts bool to a new type tf.float32
@@ -149,13 +150,20 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))  # Casts bool
 sess.run(tf.initialize_all_variables())  # init all variables
 
 for i in range(20001):
-    batch = mnist.train.next_batch(50)
+    num_train = train_data.shape[0]
+    batch_mask = np.random.choice(num_train, 50)
+    X_batch = train_data[batch_mask]
+    X_batch_normal = np.multiply(X_batch, 1.0 / 255.0)
+    y_batch = train_label[batch_mask]
+    # batch = mnist.train.next_batch(50)
     if i % 100 == 0:
-        train_accuracy = accuracy.eval(feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
+        train_accuracy = accuracy.eval(feed_dict={x:X_batch_normal, y_: y_batch, keep_prob: 1.0})
         print("step %d, training accuracy %g" % (i, train_accuracy))
-    train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+    train_step.run(feed_dict={x:X_batch_normal, y_: y_batch, keep_prob: 0.5})
 
-print("test accuracy %g" % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+mnist_test = np.multiply(mnist.test.images, 1.0 / 255.0)
+
+print("test accuracy %g" % accuracy.eval(feed_dict={x: mnist_test, y_: mnist.test.labels, keep_prob: 1.0}))
 
 BATCH_SIZE = 50
 
@@ -164,9 +172,9 @@ BATCH_SIZE = 50
 
 # using batches is more resource efficient
 predicted_lables = np.zeros(test_data.shape[0])
-for i in range(0,test_data.shape[0]//BATCH_SIZE):
-    predicted_lables[i * BATCH_SIZE : (i+1) * BATCH_SIZE] = predict_function.eval(feed_dict={x: test_data[i * BATCH_SIZE : (i+1) * BATCH_SIZE],
-                                                                                keep_prob: 1.0})
+for i in range(0,test_data.shape[0]//BATCH_SIZE)
+    test_batch =  np.multiply(test_data[i * BATCH_SIZE : (i+1) * BATCH_SIZE], 1.0 / 255.0)
+    predicted_lables[i * BATCH_SIZE : (i+1) * BATCH_SIZE] = predict_function.eval(feed_dict={x: test_batch, keep_prob: 1.0})
 # save results
-np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
-           header='id,label', comments='', fmt='%s')
+np.savetxt('LeNet_cnn_2.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
+           header='ImageId,Label', comments='', fmt='%s')
