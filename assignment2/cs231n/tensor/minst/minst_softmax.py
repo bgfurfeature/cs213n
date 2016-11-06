@@ -169,4 +169,4 @@ for i in range(0,test_data.shape[0]//BATCH_SIZE):
                                                                                 keep_prob: 1.0})
 # save results
 np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
-           header='id,label', comments='', fmt='%s')
+           header='id,Label', comments='', fmt='%s')
