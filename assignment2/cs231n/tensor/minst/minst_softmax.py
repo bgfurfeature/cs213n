@@ -172,7 +172,7 @@ BATCH_SIZE = 50
 
 # using batches is more resource efficient
 predicted_lables = np.zeros(test_data.shape[0])
-for i in range(0,test_data.shape[0]//BATCH_SIZE)
+for i in range(0,test_data.shape[0]//BATCH_SIZE):
     test_batch =  np.multiply(test_data[i * BATCH_SIZE : (i+1) * BATCH_SIZE], 1.0 / 255.0)
     predicted_lables[i * BATCH_SIZE : (i+1) * BATCH_SIZE] = predict_function.eval(feed_dict={x: test_batch, keep_prob: 1.0})
 # save results
