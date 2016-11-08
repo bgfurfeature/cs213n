@@ -159,7 +159,7 @@ for i in range(20001):
     if i % 100 == 0:
         train_accuracy = accuracy.eval(feed_dict={x: X_batch_normal, y_: y_batch, keep_prob: 1.0})
         print("step %d, training accuracy %g" % (i, train_accuracy))
-    train_step.run(feed_dict={x:X_batch_normal, y_: y_batch, keep_prob: 0.5})
+    train_step.run(feed_dict={x: X_batch_normal, y_: y_batch, keep_prob: 0.5})
 
 mnist_test = np.multiply(mnist.test.images, 1.0 / 255.0)
 
