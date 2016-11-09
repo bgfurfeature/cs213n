@@ -1,20 +1,81 @@
+# coding=utf-8
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-import gzip
-import os
-import re
-import sys
-import tarfile
-from cs231n.load_data import *
+
+import time
+
 import numpy as np
 import tensorflow as tf
 
+import numpy as np
+import cPickle as pickle
+import os
 
-#
-import time
+def __load_CIFAR_batch(filename):
+    """ load single batch of cifar """
+    with open(filename, 'rb') as f:
+        datadict = pickle.load(f)
+        X = datadict['data']
+        Y = datadict['labels']
+        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
+        Y = np.array(Y)
+        return X, Y
 
+
+def __load_CIFAR10(ROOT):
+    """ load all of cifar """
+    xs = []
+    ys = []
+    for b in range(1, 6):
+        # f = os.path.join(ROOT, 'data_batch_%d' % (b,))
+        X, Y = __load_CIFAR_batch(ROOT + "/" + 'data_batch_%d' % (b,))
+        xs.append(X)
+        ys.append(Y)
+    Xtr = np.concatenate(xs)
+    Ytr = np.concatenate(ys)
+    del X, Y
+    # Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
+    Xte, Yte = __load_CIFAR_batch(ROOT + '/test_batch')
+    return Xtr, Ytr, Xte, Yte
+
+
+def get_CIFAR10_data(file_name, num_training=49000, num_validation=1000, num_test=1000):
+    """
+    Load the CIFAR-10 dataset from disk and perform preprocessing to prepare
+    it for classifiers. These are the same steps as we used for the SVM, but
+    condensed to a single function.
+    """
+    # Load the raw CIFAR-10 data
+    cifar10_dir = file_name
+    X_train, y_train, X_test, y_test = __load_CIFAR10(cifar10_dir)
+
+    # Subsample the data
+    mask = range(num_training, num_training + num_validation)
+    # print  mask
+    # print X_train.shape
+    X_val = X_train[mask]
+    y_val = y_train[mask]
+    mask = range(num_training)
+    X_train = X_train[mask]
+    y_train = y_train[mask]
+
+    # Normalize the data: subtract the mean image, same mean pls
+    mean_image = np.mean(X_train, axis=0)
+    X_train -= mean_image
+    X_val -= mean_image
+    X_test -= mean_image
+
+    # Transpose so that channels come first
+    # X_train = X_train.transpose(0, 3, 1, 2).copy()
+    # X_val = X_val.transpose(0, 3, 1, 2).copy()
+    # X_test = X_test.transpose(0, 3, 1, 2).copy()
+    return {
+        'X_train': X_train, 'y_train': y_train,
+        'X_val': X_val, 'y_val': y_val,
+        'X_test': X_test, 'y_test': y_test,
+    }
 
 class cifarTrain(object):
 
@@ -97,7 +158,7 @@ class cifarEvaluation(object):
 #
 class cifarModel(object):
 
-    def __init__(self, flag=None, batch_size=50, NUM_CLASSES=10):
+    def __init__(self, flag='float32', batch_size=50, NUM_CLASSES=10):
         self.desc = "This is a cnn model for specific traning data CIFAR-10!!"
         self.flag = flag
         self.batch_size = batch_size
@@ -126,8 +187,8 @@ class cifarModel(object):
         """
         dtype = self.dtype()
 
-        initialer = tf.truncated_normal_initializer(stddev=stddev, dtype=dtype)
-        var = tf.get_variable(name=name, shape=shape, dtype=dtype, initialer=initialer)
+        initial = tf.truncated_normal_initializer(stddev=stddev, dtype=dtype)
+        var = tf.get_variable(name=name, shape=shape, dtype=dtype, initializer=initial)
 
         if wd is not None:
             # weight l2 loss
@@ -178,9 +239,9 @@ class cifarModel(object):
         # local3
         with tf.variable_scope('local3') as scope:
             # Move everything into depth so we can perform a single matrix multiply.
-            reshape = tf.reshape(pool2, [self.batch_size, -1])
-            dim = reshape.get_shape()[1].value
-            weights = self._variable_with_weight_decay('weights', shape=[dim, 384], stddev=0.04, wd=0.004)
+            reshape = tf.reshape(pool2, [-1, 8 * 8 * 64])
+            # dim = reshape.get_shape()[1]
+            weights = self._variable_with_weight_decay('weights', shape=[8 * 8 * 64, 384], stddev=0.04, wd=0.004)
             biases = self.bias('biases', [384], value=0.1)
             local3 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
 
@@ -211,8 +272,7 @@ class cifarModel(object):
         :param labels:
         :return:
         """
-        labels = tf.cast(labels, tf.int64)
-        cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, labels, name='cross_entropy_per_example')
+        cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, labels, name='cross_entropy_per_example')
         cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
         tf.add_to_collection('losses', cross_entropy_mean)  # data loss
 
@@ -228,9 +288,8 @@ class cifarModel(object):
 # 9 => [0 0 0 0 0 0 0 0 0 1]
 def label_to_one_hot(labels, num_classes):
     num_batch = labels.shape[0]
-    index_offset = np.arange(
-        num_batch) * num_classes  # each row has num_classes item，so for each row the offset is row_number * num_classes
-    label_flat_hot = np.zeros(num_batch, num_classes)
+    index_offset = np.arange(num_batch) * num_classes   # each row has num_classes item，so for each row the offset is row_number * num_classes
+    label_flat_hot = np.zeros((num_batch, num_classes))
     label_flat_hot.flat[index_offset + labels.ravel()] = 1
     return label_flat_hot
 
@@ -253,25 +312,36 @@ if __name__ == '__main__':
     print ("test_data length: %d" % len(test_data))
     print ("test_label length: %d" % len(test_label))
 
+    class_list = []
+    class_list_2 = []
+    class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse", 8: "ship", 9: "truck"}
+    N = test_data.shape[0]
+    # for index in xrange(N):
+    #         pre_class_2 = class_dic[test_label[index]]
+    #         class_list_2.append(pre_class_2)
+    #
+    # np.savetxt('cifar10_CNN_no_train_get.csv', np.c_[range(1, len(test_data) + 1), class_list_2], delimiter=',',
+    #            header='ImageId,Label', comments='', fmt='%s')
+
     label_count = np.unique(train_labels).shape[0]
 
     images = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])  # None means whatever size you like
     labels = tf.placeholder(tf.float32, shape=[None, cifarModel.NUM_CLASSES])
 
     # graph
-    session = tf.InteractiveSession
-    init = tf.initialize_all_variables()
+    session = tf.InteractiveSession()
+
     # x_image = tf.reshape(images, [-1, 32, 32, 3])
     logits = cifarModel.process(images)
 
     # Calculate loss.
-    loss = cifarModel.loss(logits, labels)
-    train_step = tf.train.AdadeltaOptimizer(1e-5).minimize(loss)
+    loss_ = cifarModel.loss(logits, labels)
+    train_step = tf.train.AdadeltaOptimizer(1e-5).minimize(loss_)
     # define predict function
     predict_function = tf.argmax(logits, 1)
     correct_prediction = tf.equal(predict_function, tf.argmax(labels, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-    session.run(init)
+    session.run(tf.initialize_all_variables())
 
     BATCH_SIZE = 128
     for step in xrange(1000000):
@@ -293,15 +363,19 @@ if __name__ == '__main__':
     # using batches is more resource efficient
     predicted_lables = np.zeros(test_data.shape[0])
     for i in range(0, test_data.shape[0] // BATCH_SIZE):
-        test_batch = np.multiply(test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE], 1.0 / 255.0)
+        test_batch = test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]
         predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_data})
 
-    class_list = []
-    class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse", 8: "ship", 9: "truck"}
-    N = predicted_lables.size
-    for index in xrange(N):
-        pre_class = class_dic[predicted_lables[index]]
-        class_list.append(pre_class)
+    try:
+        for index in xrange(N):
+            pre_class = class_dic[predicted_lables[index]]
+            class_list.append(pre_class)
+
+        for index in xrange(N):
+            pre_class_2 = class_dic[test_label[index]]
+            class_list_2.append(pre_class_2)
+    except:
+        pass
     # save results
-    np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(test_data) + 1), class_dic], delimiter=',',
+    np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(test_data) + 1), class_list], delimiter=',',
                header='ImageId,Label', comments='', fmt='%s')

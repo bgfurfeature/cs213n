@@ -24,9 +24,8 @@ def display(image, height, weight):
 # 9 => [0 0 0 0 0 0 0 0 0 1]
 def label_to_one_hot(labels, num_classes):
     num_batch = labels.shape[0]
-    index_offset = np.arange(
-        num_batch) * num_classes  # each row has num_classes item，so for each row the offset is row_number * num_classes
-    label_flat_hot = np.zeros(num_batch, num_classes)
+    index_offset = np.arange(num_batch) * num_classes  # each row has num_classes item，so for each row the offset is row_number * num_classes
+    label_flat_hot = np.zeros((num_batch, num_classes))
     label_flat_hot.flat[index_offset + labels.ravel()] = 1
     return label_flat_hot
 
