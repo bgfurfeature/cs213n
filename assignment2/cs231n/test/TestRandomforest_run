@@ -1,0 +1,92 @@
+training_data:[[0, 0, 0, 0, 'yes'], [0, 0, 0, 0, 'no'], [0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'no'], [0, 0, 1, 0, 'yes'], [0, 0, 1, 0, 'no'], [0, 0, 1, 1, 'yes'], [0, 0, 1, 1, 'no'], [0, 1, 0, 0, 'yes'], [0, 1, 0, 0, 'no'], [0, 1, 0, 1, 'yes'], [0, 1, 0, 1, 'no'], [0, 1, 1, 0, 'yes'], [0, 1, 1, 0, 'no'], [0, 1, 1, 1, 'yes'], [0, 1, 1, 1, 'no'], [1, 0, 0, 0, 'yes'], [1, 0, 0, 0, 'no'], [1, 0, 0, 1, 'yes'], [1, 0, 0, 1, 'no'], [1, 0, 1, 0, 'yes'], [1, 0, 1, 0, 'no']]
+sample:[[0, 0, 0, 1, 'yes'], [0, 0, 0, 0, 'yes'], [0, 0, 0, 0, 'yes'], [1, 0, 1, 0, 'no'], [0, 0, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 1, 0, 0, 'no'], [0, 1, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 1, 1, 0, 'no'], [0, 0, 0, 0, 'no'], [0, 1, 0, 0, 'yes'], [1, 0, 1, 0, 'yes'], [1, 0, 1, 0, 'no'], [0, 1, 0, 0, 'yes'], [0, 0, 1, 1, 'yes'], [1, 0, 0, 1, 'yes'], [0, 0, 1, 0, 'no'], [0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'yes'], [0, 1, 1, 0, 'yes'], [1, 0, 0, 0, 'no']]
+currentGini:0.5
+col:0 , value:0 , dividedGini:0.5 , gini lower result is:0.0
+col:0 , value:1 , dividedGini:0.494117647059 , gini lower result is:0.00588235294118
+bestCriteria:(0, 1) , best gini is:0.00588235294118
+col:1 , value:0 , dividedGini:0.5 , gini lower result is:0.0
+col:1 , value:1 , dividedGini:0.5 , gini lower result is:0.0
+create trueBranch child tree!!
+sample:[[1, 0, 1, 0, 'no'], [1, 0, 1, 0, 'yes'], [1, 0, 1, 0, 'no'], [1, 0, 0, 1, 'yes'], [1, 0, 0, 0, 'no']]
+currentGini:0.48
+col:1 , value:0 , dividedGini:0.48 , gini lower result is:0.0
+col:0 , value:1 , dividedGini:0.48 , gini lower result is:0.0
+saving result for node!!
+create falseBranch child tree!!
+sample:[[0, 0, 0, 1, 'yes'], [0, 0, 0, 0, 'yes'], [0, 0, 0, 0, 'yes'], [0, 0, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 1, 0, 0, 'no'], [0, 1, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 1, 1, 0, 'no'], [0, 0, 0, 0, 'no'], [0, 1, 0, 0, 'yes'], [0, 1, 0, 0, 'yes'], [0, 0, 1, 1, 'yes'], [0, 0, 1, 0, 'no'], [0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'yes'], [0, 1, 1, 0, 'yes']]
+currentGini:0.498269896194
+col:2 , value:0 , dividedGini:0.498269896194 , gini lower result is:-5.55111512313e-17
+col:2 , value:1 , dividedGini:0.497737556561 , gini lower result is:0.000532339632686
+bestCriteria:(2, 1) , best gini is:0.000532339632686
+col:3 , value:0 , dividedGini:0.498269896194 , gini lower result is:-5.55111512313e-17
+col:3 , value:1 , dividedGini:0.496732026144 , gini lower result is:0.00153787004998
+bestCriteria:(3, 1) , best gini is:0.00153787004998
+create trueBranch child tree!!
+sample:[[0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 1, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 0, 1, 1, 'yes'], [0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'yes']]
+currentGini:0.5
+col:0 , value:0 , dividedGini:0.5 , gini lower result is:0.0
+col:1 , value:0 , dividedGini:0.5 , gini lower result is:0.0
+col:1 , value:1 , dividedGini:0.428571428571 , gini lower result is:0.0714285714286
+bestCriteria:(1, 1) , best gini is:0.0714285714286
+create trueBranch child tree!!
+sample:[[0, 1, 0, 1, 'no']]
+currentGini:0.0
+col:1 , value:1 , dividedGini:0.0 , gini lower result is:0.0
+col:3 , value:1 , dividedGini:0.0 , gini lower result is:0.0
+saving result for node!!
+create falseBranch child tree!!
+sample:[[0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 0, 0, 1, 'no'], [0, 0, 1, 1, 'yes'], [0, 0, 0, 1, 'yes'], [0, 0, 0, 1, 'yes']]
+currentGini:0.489795918367
+col:0 , value:0 , dividedGini:0.489795918367 , gini lower result is:0.0
+col:3 , value:1 , dividedGini:0.489795918367 , gini lower result is:0.0
+saving result for node!!
+return node!!
+create falseBranch child tree!!
+sample:[[0, 0, 0, 0, 'yes'], [0, 0, 0, 0, 'yes'], [0, 1, 0, 0, 'no'], [0, 1, 1, 0, 'no'], [0, 0, 0, 0, 'no'], [0, 1, 0, 0, 'yes'], [0, 1, 0, 0, 'yes'], [0, 0, 1, 0, 'no'], [0, 1, 1, 0, 'yes']]
+currentGini:0.493827160494
+col:1 , value:0 , dividedGini:0.493827160494 , gini lower result is:-5.55111512313e-17
+col:1 , value:1 , dividedGini:0.488888888889 , gini lower result is:0.00493827160494
+bestCriteria:(1, 1) , best gini is:0.00493827160494
+col:2 , value:0 , dividedGini:0.493827160494 , gini lower result is:-5.55111512313e-17
+col:2 , value:1 , dividedGini:0.444444444444 , gini lower result is:0.0493827160494
+bestCriteria:(2, 1) , best gini is:0.0493827160494
+create trueBranch child tree!!
+sample:[[0, 1, 1, 0, 'no'], [0, 0, 1, 0, 'no'], [0, 1, 1, 0, 'yes']]
+currentGini:0.444444444444
+col:3 , value:0 , dividedGini:0.444444444444 , gini lower result is:0.0
+col:1 , value:0 , dividedGini:0.444444444444 , gini lower result is:0.0
+col:1 , value:1 , dividedGini:0.333333333333 , gini lower result is:0.111111111111
+bestCriteria:(1, 1) , best gini is:0.111111111111
+create trueBranch child tree!!
+sample:[[0, 1, 1, 0, 'no'], [0, 1, 1, 0, 'yes']]
+currentGini:0.5
+col:1 , value:1 , dividedGini:0.5 , gini lower result is:0.0
+col:3 , value:0 , dividedGini:0.5 , gini lower result is:0.0
+saving result for node!!
+create falseBranch child tree!!
+sample:[[0, 0, 1, 0, 'no']]
+currentGini:0.0
+col:3 , value:0 , dividedGini:0.0 , gini lower result is:0.0
+col:0 , value:0 , dividedGini:0.0 , gini lower result is:0.0
+saving result for node!!
+return node!!
+create falseBranch child tree!!
+sample:[[0, 0, 0, 0, 'yes'], [0, 0, 0, 0, 'yes'], [0, 1, 0, 0, 'no'], [0, 0, 0, 0, 'no'], [0, 1, 0, 0, 'yes'], [0, 1, 0, 0, 'yes']]
+currentGini:0.444444444444
+col:0 , value:0 , dividedGini:0.444444444444 , gini lower result is:0.0
+col:2 , value:0 , dividedGini:0.444444444444 , gini lower result is:0.0
+saving result for node!!
+return node!!
+return node!!
+return node!!
+col:0,feature:1 ?
+  T-> {'yes': 2, 'no': 3}
+  F-> col:3,feature:1 ?
+    T-> col:1,feature:1 ?
+      T-> {'no': 1}
+      F-> {'yes': 4, 'no': 3}
+    F-> col:2,feature:1 ?
+      T-> col:1,feature:1 ?
+        T-> {'yes': 1, 'no': 1}
+        F-> {'no': 1}
+      F-> {'yes': 4, 'no': 2}

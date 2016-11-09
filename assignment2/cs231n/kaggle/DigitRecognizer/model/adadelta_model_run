@@ -1,0 +1,58 @@
+# firstConv -> 28 x 28 x1 with filter 5 x 5 x 6, stride 1, pad 2 transformed to 28 x 28 x 6
+# maxpool -> 28 x 28 x 6 with pool size 2 x 2, stride 2 transformed to 14 x 14 x 6
+# fc_1 -> neuron number 120
+# fc_2 -> neuron number 84
+# out -> classes 10
+use adadelta to update params;batch_size = 50
+0.98057
+
+(41000L, 1L, 28L, 28L)
+(Iteration 1 / 4100) loss: 2.302661
+(Epoch 0 / 5) train acc: 0.104000; val_acc: 0.104000
+(Iteration 101 / 4100) loss: 1.765809
+(Iteration 201 / 4100) loss: 0.721966
+(Iteration 301 / 4100) loss: 0.545862
+(Iteration 401 / 4100) loss: 0.133271
+(Iteration 501 / 4100) loss: 0.136419
+(Iteration 601 / 4100) loss: 0.055751
+(Iteration 701 / 4100) loss: 0.115485
+(Iteration 801 / 4100) loss: 0.256372
+(Epoch 1 / 5) train acc: 0.951000; val_acc: 0.957000
+(Iteration 901 / 4100) loss: 0.137241
+(Iteration 1001 / 4100) loss: 0.024588
+(Iteration 1101 / 4100) loss: 0.041934
+(Iteration 1201 / 4100) loss: 0.043082
+(Iteration 1301 / 4100) loss: 0.031169
+(Iteration 1401 / 4100) loss: 0.195740
+(Iteration 1501 / 4100) loss: 0.077200
+(Iteration 1601 / 4100) loss: 0.014117
+(Epoch 2 / 5) train acc: 0.977000; val_acc: 0.960000
+(Iteration 1701 / 4100) loss: 0.041100
+(Iteration 1801 / 4100) loss: 0.067420
+(Iteration 1901 / 4100) loss: 0.161983
+(Iteration 2001 / 4100) loss: 0.099306
+(Iteration 2101 / 4100) loss: 0.026939
+(Iteration 2201 / 4100) loss: 0.198339
+(Iteration 2301 / 4100) loss: 0.013517
+(Iteration 2401 / 4100) loss: 0.172459
+(Epoch 3 / 5) train acc: 0.982000; val_acc: 0.968000
+(Iteration 2501 / 4100) loss: 0.215066
+(Iteration 2601 / 4100) loss: 0.110403
+(Iteration 2701 / 4100) loss: 0.045726
+(Iteration 2801 / 4100) loss: 0.010412
+(Iteration 2901 / 4100) loss: 0.221521
+(Iteration 3001 / 4100) loss: 0.054993
+(Iteration 3101 / 4100) loss: 0.112357
+(Iteration 3201 / 4100) loss: 0.031122
+(Epoch 4 / 5) train acc: 0.995000; val_acc: 0.975000
+(Iteration 3301 / 4100) loss: 0.148443
+(Iteration 3401 / 4100) loss: 0.075865
+(Iteration 3501 / 4100) loss: 0.012531
+(Iteration 3601 / 4100) loss: 0.044420
+(Iteration 3701 / 4100) loss: 0.123319
+(Iteration 3801 / 4100) loss: 0.032241
+(Iteration 3901 / 4100) loss: 0.054655
+(Iteration 4001 / 4100) loss: 0.013431
+(Epoch 5 / 5) train acc: 0.996000; val_acc: 0.978000
+train time: 18591.442000s
+predict time: 7.056000s
