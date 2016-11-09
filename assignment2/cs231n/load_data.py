@@ -57,11 +57,9 @@ def get_CIFAR10_data(file_name, num_training=49000, num_validation=1000, num_tes
     X_test -= mean_image
 
     # Transpose so that channels come first
-    X_train = X_train.transpose(0, 3, 1, 2).copy()
-    X_val = X_val.transpose(0, 3, 1, 2).copy()
-    X_test = X_test.transpose(0, 3, 1, 2).copy()
-
-    # Package data into a dictionary
+    # X_train = X_train.transpose(0, 3, 1, 2).copy()
+    # X_val = X_val.transpose(0, 3, 1, 2).copy()
+    # X_test = X_test.transpose(0, 3, 1, 2).copy()
     return {
         'X_train': X_train, 'y_train': y_train,
         'X_val': X_val, 'y_val': y_val,

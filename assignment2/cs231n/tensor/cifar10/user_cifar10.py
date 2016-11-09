@@ -240,10 +240,19 @@ if __name__ == '__main__':
     global_step = tf.Variable(0, trainable=False)
     # load_data
     data = get_CIFAR10_data('/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py')
+
     train_data = data['X_train']
     train_labels = data['y_train']
+    val_data = data['X_val']
+    val_label = data['y_val']
     test_data = data['X_test']
     test_label = data['y_test']
+
+    print ("train_data length: %d" % len(train_data))
+    print ("val_data length: %d" % len(val_data))
+    print ("test_data length: %d" % len(test_data))
+    print ("test_label length: %d" % len(test_label))
+
     label_count = np.unique(train_labels).shape[0]
 
     images = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])  # None means whatever size you like
@@ -264,9 +273,10 @@ if __name__ == '__main__':
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     session.run(init)
 
+    BATCH_SIZE = 128
     for step in xrange(1000000):
             num_train = train_data.shape[0]
-            batch_mask = np.random.choice(num_train, 128)
+            batch_mask = np.random.choice(num_train, BATCH_SIZE)
             train_data_batch = train_data[batch_mask]
             train_labels_batch = label_to_one_hot(train_labels[batch_mask], label_count)
 
@@ -277,3 +287,21 @@ if __name__ == '__main__':
                 print("step %d, training accuracy %g" % (step, train_accuracy))
             duration = time.time() - start_time
             print ('duration:%d' % duration)
+
+    print("val_data accuracy %g" % accuracy.eval(feed_dict={images: val_data, labels: label_to_one_hot(val_label, label_count)}))
+
+    # using batches is more resource efficient
+    predicted_lables = np.zeros(test_data.shape[0])
+    for i in range(0, test_data.shape[0] // BATCH_SIZE):
+        test_batch = np.multiply(test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE], 1.0 / 255.0)
+        predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_data})
+
+    class_list = []
+    class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse", 8: "ship", 9: "truck"}
+    N = predicted_lables.size
+    for index in xrange(N):
+        pre_class = class_dic[predicted_lables[index]]
+        class_list.append(pre_class)
+    # save results
+    np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(test_data) + 1), class_dic], delimiter=',',
+               header='ImageId,Label', comments='', fmt='%s')
