@@ -1,3 +1,4 @@
+# coding=utf-8
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import numpy as np
@@ -8,9 +9,20 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 print(len(mnist.test.images))
 
 
+# 0 => [1 0 0 0 0 0 0 0 0 0]
+# 1 => [0 1 0 0 0 0 0 0 0 0]
+# ...
+# 9 => [0 0 0 0 0 0 0 0 0 1]
+def label_to_one_hot(labels, num_classes):
+    num_batch = labels.shape[0]
+    index_offset = np.arange(num_batch) * num_classes  # each row has num_classes item，so for each row the offset is row_number * num_classes
+    label_flat_hot = np.zeros(num_batch, num_classes)
+    label_flat_hot.flat[index_offset + labels.ravel()] = 1
+    return label_flat_hot
+
+
 # Load the (preprocessed) data; csv file
 def load_data(training_file, test_file):
-
     data_set = pd.read_csv(training_file)
     train_target = data_set[[0]].values.ravel()
     train = data_set.iloc[:, 1:].values
@@ -28,12 +40,15 @@ def load_data(training_file, test_file):
     }
 
 
-data_set_home='/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/digtialRecognizer/'
+data_set_home = '/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/digtialRecognizer/'
 
 data = load_data(data_set_home + "train.csv", data_set_home + "test.csv")
 
 train_data = data['X_train']  # 42000
 train_label = data['y_train']
+label_count = np.unique(train_label).shape[0]
+train_label_one_hot = label_to_one_hot(train_label, label_count)
+
 test_data = data['X_test']  # 28000
 print "train_data length: %d" % len(train_data)
 print "test_data length: %d" % len(test_data)
@@ -102,11 +117,12 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
 
+
 # first convolution layer
 W_conv1 = weight_variable([5, 5, 1, 32])
 b_conv1 = bias_variable([32])
 
-# change input to the format we need [batch heigth weight channel]
+# change input to the format we need [batch height weight channel]
 x_image = tf.reshape(x, [-1, 28, 28, 1])
 # layer inside calculation include convolution relu pooling
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
@@ -165,7 +181,7 @@ for i in range(20001):
     batch_mask = np.random.choice(num_train, 50)
     X_batch = train_data[batch_mask]
     X_batch_normal = np.multiply(X_batch, 1.0 / 255.0)
-    y_batch = train_label[batch_mask]
+    y_batch = label_to_one_hot(train_label[batch_mask],label_count)
     # batch = mnist.train.next_batch(50)
     if i % 100 == 0:
         train_accuracy = accuracy.eval(feed_dict={x: X_batch_normal, y_: y_batch, keep_prob: 1.0})
@@ -183,9 +199,10 @@ BATCH_SIZE = 50
 
 # using batches is more resource efficient
 predicted_lables = np.zeros(test_data.shape[0])
-for i in range(0,test_data.shape[0]//BATCH_SIZE):
-    test_batch =  np.multiply(test_data[i * BATCH_SIZE : (i+1) * BATCH_SIZE], 1.0 / 255.0)
-    predicted_lables[i * BATCH_SIZE : (i+1) * BATCH_SIZE] = predict_function.eval(feed_dict={x: test_batch, keep_prob: 1.0})
+for i in range(0, test_data.shape[0] // BATCH_SIZE):
+    test_batch = np.multiply(test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE], 1.0 / 255.0)
+    predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(
+        feed_dict={x: test_batch, keep_prob: 1.0})
 # save results
 np.savetxt('LeNet_cnn_2.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
            header='ImageId,Label', comments='', fmt='%s')
