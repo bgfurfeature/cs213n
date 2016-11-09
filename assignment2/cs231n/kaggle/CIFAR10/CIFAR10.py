@@ -1,12 +1,12 @@
 """ url - https://www.kaggle.com/c/digit-recognizer """
 
 from time import time
-import matplotlib.cm as cm
+
 import matplotlib.pyplot as plt
-import pandas as pd
+
 from cs231n.classifiers.CIFAR10NetWork import *
 from cs231n.kaggle.CIFAR10.CIFAR10Solver import *
-from cs231n.kaggle.CIFAR10.load_data import *
+from cs231n.load_data import *
 
 plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
