@@ -50,7 +50,7 @@ class Image_process(object):
 
 
 if __name__ == '__main__':
-    image = Image_process(file_path="H:/MachineLearning/DataSet/kaggle.com/cifar-10/test_2/test/",
+    image = Image_process(file_path="kaggle.com/cifar-10/test_2/test/",
                           num_pic=300000)
     image.pixels()
     image.save_as_pickle("test_data_batch")
