@@ -357,7 +357,7 @@ if __name__ == '__main__':
     predicted_lables = np.zeros(test_data.shape[0])
     for i in range(0, test_data.shape[0] // BATCH_SIZE):
         test_batch = test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]
-        predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_data})
+        predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_batch})
 
     try:
         for index in xrange(N):
