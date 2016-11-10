@@ -321,7 +321,7 @@ if __name__ == '__main__':
     #         class_list_2.append(pre_class_2)
     #
     # np.savetxt('cifar10_CNN_no_train_get.csv', np.c_[range(1, len(test_data) + 1), class_list_2], delimiter=',',
-    #            header='ImageId,Label', comments='', fmt='%s')
+    #            header='id,label', comments='', fmt='%s')
 
     label_count = np.unique(train_labels).shape[0]
 
@@ -378,4 +378,4 @@ if __name__ == '__main__':
         pass
     # save results
     np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(test_data) + 1), class_list], delimiter=',',
-               header='ImageId,Label', comments='', fmt='%s')
+               header='id,label', comments='', fmt='%s')
