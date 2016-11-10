@@ -227,6 +227,13 @@ def __load_CIFAR_batch(filename):
         Y = np.array(Y)
         return X, Y
 
+def __load_test_data_batch_with_no_label(filename):
+    """ load single batch of cifar """
+    with open(filename, 'rb') as f:
+        datadict = pickle.load(f)
+        X = datadict['data']
+        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
+        return X
 
 def __load_CIFAR10(ROOT):
     """ load all of cifar """
@@ -240,9 +247,9 @@ def __load_CIFAR10(ROOT):
     Xtr = np.concatenate(xs)
     Ytr = np.concatenate(ys)
     del X, Y
-    # Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
-    Xte, Yte = __load_CIFAR_batch(ROOT + '/test_batch')
-    return Xtr, Ytr, Xte, Yte
+    Xval, Yval = __load_CIFAR_batch(ROOT + '/test_batch')
+    Xte = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch')
+    return Xtr, Ytr, Xval, Yval, Xte
 
 
 def get_CIFAR10_data(file_name, num_training=49000, num_validation=1000, num_test=1000):
@@ -253,18 +260,20 @@ def get_CIFAR10_data(file_name, num_training=49000, num_validation=1000, num_tes
     """
     # Load the raw CIFAR-10 data
     cifar10_dir = file_name
-    X_train, y_train, X_test, y_test = __load_CIFAR10(cifar10_dir)
+    X_train, y_train, X_val, y_val, X_test = __load_CIFAR10(cifar10_dir)
 
     # Subsample the data
     # print X_train.shape
     # Normalize the data: subtract the mean image, same mean pls
     mean_image = np.mean(X_train, axis=0)
     X_train -= mean_image
+    X_val -= mean_image
     X_test -= mean_image
 
     return {
         'X_train': X_train, 'y_train': y_train,
-        'X_test': X_test, 'y_test': y_test,
+        'X_val': X_val, 'y_val': y_val,
+        'X_test': X_test
     }
 # 0 => [1 0 0 0 0 0 0 0 0 0]
 # 1 => [0 1 0 0 0 0 0 0 0 0]
@@ -286,12 +295,14 @@ if __name__ == '__main__':
 
     train_data = data['X_train']
     train_labels = data['y_train']
+    val_data = data['X_val']
+    val_label = data['y_val']
     test_data = data['X_test']
     test_label = data['y_test']
 
     print ("train_data length: %d" % len(train_data))
+    print ("val_data length: %d" % len(val_data))
     print ("test_data length: %d" % len(test_data))
-    print ("test_label length: %d" % len(test_label))
 
     class_list = []
     class_list_2 = []
@@ -339,7 +350,7 @@ if __name__ == '__main__':
                 train_accuracy = accuracy.eval(feed_dict={images: train_data_batch, labels: train_labels_batch})
                 print("step %d, training accuracy %g" % (step, train_accuracy))
 
-    print("test accuracy %g" % accuracy.eval(feed_dict={images: test_data, labels: label_to_one_hot(test_label, label_count)}))
+    print("val accuracy %g" % accuracy.eval(feed_dict={images: val_data, labels: label_to_one_hot(val_label, label_count)}))
 
     # using batches is more resource efficient
     predicted_lables = np.zeros(test_data.shape[0])
