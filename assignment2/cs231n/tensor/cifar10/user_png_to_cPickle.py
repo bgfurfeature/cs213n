@@ -16,9 +16,12 @@ class Image_process(object):
         self.pixel_array = []
         self.height = self.weight = 32
         self.channel = 3
+        self.batch_size = 10000
 
     # get pixels of a image
     def pixels(self):
+
+        index = 1
         for i in range(1, self.num_pic + 1):
             file_name = self.file + str(i) + ".png"
             image_object = Image.open(file_name, mode='r')
@@ -29,6 +32,9 @@ class Image_process(object):
             # g_arr = np.asanyarray(g, dtype=np.uint8)
             # b_arr = np.asanyarray(b, dtype=np.uint8)
             self.pixel_array.append(image_arr)
+            if i % 10000 == 0:
+                self.save_as_pickle("test_data_batch_%d" % (index, ))
+                index += 1
 
     # save to pickle file
     def save_as_pickle(self, file_name=None):
@@ -38,20 +44,22 @@ class Image_process(object):
             print 'file_name should not be None!!'
             return
         data_format = np.asanyarray(self.pixel_array, dtype=np.uint8).reshape(
-            (self.num_pic, self.height * self.weight * self.channel))
+            (self.batch_size, self.height * self.weight * self.channel))
         self.pixel_dict = {'data': data_format}
         print self.pixel_dict['data'].shape
         f = file(path, 'wb')
         pickle.dump(self.pixel_dict, f, True)
         f.close()
+        self.pixel_array = []
+        self.pixel_dict = {}
         # f2 = file(path, 'rb')
         # res = pickle.load(f2)
         # f2.close()
 
 
 if __name__ == '__main__':
-    image = Image_process(file_path="kaggle.com/cifar-10/test_2/test/",
+    image = Image_process(file_path="H:/MachineLearning/DataSet/kaggle.com/cifar-10/test_2/test/",
                           num_pic=300000)
     image.pixels()
-    image.save_as_pickle("test_data_batch")
+    # image.save_as_pickle("test_data_batch")
     print 'finished!!'

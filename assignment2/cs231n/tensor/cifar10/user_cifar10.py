@@ -232,12 +232,13 @@ def __load_test_data_batch_with_no_label(filename):
     with open(filename, 'rb') as f:
         datadict = pickle.load(f)
         X = datadict['data']
-        X = X.reshape(300000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
+        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
         return X
 
 def __load_CIFAR10(ROOT):
     """ load all of cifar """
     xs = []
+    xs1 = []
     ys = []
     for b in range(1, 6):
         # f = os.path.join(ROOT, 'data_batch_%d' % (b,))
@@ -248,7 +249,12 @@ def __load_CIFAR10(ROOT):
     Ytr = np.concatenate(ys)
     del X, Y
     Xval, Yval = __load_CIFAR_batch(ROOT + '/test_batch')
-    Xte = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch')
+
+    for a in range(1, 31):
+        X1 = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (a,))
+        xs1.append(X1)
+    Xte = np.concatenate(xs1)
+    del X1
     return Xtr, Ytr, Xval, Yval, Xte
 
 
