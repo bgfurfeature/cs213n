@@ -336,6 +336,7 @@ if __name__ == '__main__':
     session.run(tf.initialize_all_variables())
 
     BATCH_SIZE = 128
+
     for step in xrange(1000000):
             num_train = train_data.shape[0]
             batch_mask = np.random.choice(num_train, BATCH_SIZE)
