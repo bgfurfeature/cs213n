@@ -232,7 +232,7 @@ def __load_test_data_batch_with_no_label(filename):
     with open(filename, 'rb') as f:
         datadict = pickle.load(f)
         X = datadict['data']
-        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
+        X = X.reshape(300000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
         return X
 
 def __load_CIFAR10(ROOT):
@@ -252,7 +252,7 @@ def __load_CIFAR10(ROOT):
     return Xtr, Ytr, Xval, Yval, Xte
 
 
-def get_CIFAR10_data(file_name, num_training=49000, num_validation=1000, num_test=1000):
+def get_CIFAR10_data(file_name, num_training=50000, num_validation=10000, num_test=10000):
     """
     Load the CIFAR-10 dataset from disk and perform preprocessing to prepare
     it for classifiers. These are the same steps as we used for the SVM, but
