@@ -247,14 +247,14 @@ def __load_CIFAR10(ROOT):
         ys.append(Y)
     Xtr = np.concatenate(xs)
     Ytr = np.concatenate(ys)
-    del X, Y
+    del X, Y, xs, ys
     Xval, Yval = __load_CIFAR_batch(ROOT + '/test_batch')
 
     for a in range(1, 31):
         X1 = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (a,))
         xs1.append(X1)
     Xte = np.concatenate(xs1)
-    del X1
+    del X1, xs1
     return Xtr, Ytr, Xval, Yval, Xte
 
 
