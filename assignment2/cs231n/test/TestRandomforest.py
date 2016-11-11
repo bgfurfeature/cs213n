@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 from cs231n.classifiers.randomforests import *
+import cPickle as pickle
 
 data = []
 data_dir = "E:/github/cs231n/assignment2/cs231n/datasets/iris/"
@@ -36,30 +37,39 @@ print resList
 predict_and_label = np.equal(np.array(test_label), np.array(resList))
 correct = [data for data in predict_and_label if data]
 num = len(correct)
-print ("acc:%0.04f" % (count / (total * 1.0)))
-print ("acc:%0.04f" % (num / (total * 1.0)))
+
 classifier.printTree(classifier.list_tree[0])
 
-classifier.save_model(classifier.list_tree)
-
-# Q: How to save the model random forest
-
-reload_classifier = RandomForestsClassifier(n_bootstrapSamples=2)
-tree_list = reload_classifier.load_model(n_bootstrapSamples=2)
-reload_classifier.list_tree = tree_list
-reload_classifier.printTree(reload_classifier.list_tree[0])
-resList = []
-count = 0
-for data in test:
-    res = reload_classifier.predict_randomForests(data)
-    label = data[4]
-    if label == res:
-        count += 1
-    resList.append(res)
-total = len(test_data)
-print resList
-predict_and_label = np.equal(np.array(test_label), np.array(resList))
-correct = [data for data in predict_and_label if data]
-num = len(correct)
 print ("acc:%0.04f" % (count / (total * 1.0)))
 print ("acc:%0.04f" % (num / (total * 1.0)))
+
+
+# simple way for saving model
+pickle.dump(classifier, file('random_forest_model.pkl', 'wb'))
+
+# restore model
+new_classifier = pickle.load(file('random_forest_model.pkl', 'rb'))
+new_classifier.printTree(classifier.list_tree[0])
+
+# # Q: How to save the model random forest
+# # order and pre_order to restore the tree
+# classifier.save_model(classifier.list_tree)
+# reload_classifier = RandomForestsClassifier(n_bootstrapSamples=2)
+# tree_list = reload_classifier.load_model(n_bootstrapSamples=2)
+# reload_classifier.list_tree = tree_list
+# reload_classifier.printTree(reload_classifier.list_tree[0])
+# resList = []
+# count = 0
+# for data in test:
+#     res = reload_classifier.predict_randomForests(data)
+#     label = data[4]
+#     if label == res:
+#         count += 1
+#     resList.append(res)
+# total = len(test_data)
+# print resList
+# predict_and_label = np.equal(np.array(test_label), np.array(resList))
+# correct = [data for data in predict_and_label if data]
+# num = len(correct)
+# print ("acc:%0.04f" % (count / (total * 1.0)))
+# print ("acc:%0.04f" % (num / (total * 1.0)))
