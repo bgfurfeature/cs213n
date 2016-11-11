@@ -277,11 +277,11 @@ def get_CIFAR10_data(file_name, num_training=50000, num_validation=10000, num_te
     mean_image = np.mean(X_train, axis=0)
     X_train -= mean_image
     X_val -= mean_image
-    # X_test -= mean_image
 
     return {
         'X_train': X_train, 'y_train': y_train,
-        'X_val': X_val, 'y_val': y_val
+        'X_val': X_val, 'y_val': y_val,
+        'mean': mean_image
     }
 
 
@@ -309,6 +309,7 @@ if __name__ == '__main__':
     train_labels = data['y_train']
     val_data = data['X_val']
     val_label = data['y_val']
+    mean_image = data['mean']
 
     print("train_data length: %d" % len(train_data))
     print("val_data length: %d" % len(val_data))
@@ -383,6 +384,7 @@ if __name__ == '__main__':
         for batch_number in range(1, 31):
             # predicted_labels = []
             test_batch = loadCIFAR10_Test('/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py', batch_number)
+            test_batch -= mean_image
             print("test_batch length: %d" % len(test_batch))
             test_label = predict_function.eval(feed_dict={images: test_batch})
             predicted_labels.append(test_label)
