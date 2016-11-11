@@ -3,26 +3,23 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 import time
-
 import numpy as np
 import tensorflow as tf
-
 import numpy as np
 import cPickle as pickle
 import os
 
-class cifarTrain(object):
 
+class cifarTrain(object):
     def __init__(self):
         self.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 10000
         self.desc = "This is a train for specific traning data CIFAR-10!!"
         # Constants describing the training process.
-        self.MOVING_AVERAGE_DECAY = 0.9999     # The decay to use for the moving average.
-        self.NUM_EPOCHS_PER_DECAY = 350.0      # Epochs after which learning rate decays.
+        self.MOVING_AVERAGE_DECAY = 0.9999  # The decay to use for the moving average.
+        self.NUM_EPOCHS_PER_DECAY = 350.0  # Epochs after which learning rate decays.
         self.LEARNING_RATE_DECAY_FACTOR = 0.1  # Learning rate decay factor.
-        self.INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
+        self.INITIAL_LEARNING_RATE = 0.1  # Initial learning rate.
         self.batch_size = 128
 
     def train(self, total_loss, global_step=0.0):
@@ -37,10 +34,10 @@ class cifarTrain(object):
 
         # Decay the learning rate exponentially based on the number of steps.
         lr = tf.train.exponential_decay(self.INITIAL_LEARNING_RATE,
-                                          global_step,
-                                          decay_steps,
-                                          self.LEARNING_RATE_DECAY_FACTOR,
-                                          staircase=True)
+                                        global_step,
+                                        decay_steps,
+                                        self.LEARNING_RATE_DECAY_FACTOR,
+                                        staircase=True)
         tf.scalar_summary('learning_rate', lr)
 
         # Generate moving averages of all losses and associated summaries.
@@ -54,7 +51,7 @@ class cifarTrain(object):
         for l in losses + [total_loss]:
             # Name each loss as '(raw)' and name the moving average version of the loss
             # as the original loss name.
-            tf.scalar_summary(l.op.name +' (raw)', l)
+            tf.scalar_summary(l.op.name + ' (raw)', l)
             tf.scalar_summary(l.op.name, loss_averages.average(l))
 
         # Compute gradients.
@@ -86,14 +83,12 @@ class cifarTrain(object):
 
 #
 class cifarEvaluation(object):
-
     def __init__(self):
         self.desc = "This is a Evaluation for specific traning data CIFAR-10!!"
 
 
 #
 class cifarModel(object):
-
     def __init__(self, flag='float32', batch_size=50, NUM_CLASSES=10):
         self.desc = "This is a cnn model for specific traning data CIFAR-10!!"
         self.flag = flag
@@ -190,7 +185,7 @@ class cifarModel(object):
         # softmax,softmax(WX + b)
         with tf.variable_scope('softmax_linear') as scope:
             weights = self._variable_with_weight_decay('weights', [192, self.NUM_CLASSES], stddev=1 / 192.0, wd=0.0)
-            biases = self.bias('biases', [ self.NUM_CLASSES], value=0.0)
+            biases = self.bias('biases', [self.NUM_CLASSES], value=0.0)
             softmax_linear = tf.add(tf.matmul(local4, weights), biases, name=scope.name)
 
         return softmax_linear
@@ -217,6 +212,7 @@ class cifarModel(object):
         # data loss + weight loss
         return tf.add_n(tf.get_collection('losses'), name='total_loss')
 
+
 def __load_CIFAR_batch(filename):
     """ load single batch of cifar """
     with open(filename, 'rb') as f:
@@ -227,6 +223,7 @@ def __load_CIFAR_batch(filename):
         Y = np.array(Y)
         return X, Y
 
+
 def __load_test_data_batch_with_no_label(filename):
     """ load single batch of cifar """
     with open(filename, 'rb') as f:
@@ -234,6 +231,7 @@ def __load_test_data_batch_with_no_label(filename):
         X = datadict['data']
         X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
         return X
+
 
 def __load_CIFAR10(ROOT):
     """ load all of cifar """
@@ -250,13 +248,18 @@ def __load_CIFAR10(ROOT):
     del X, Y, xs, ys
     Xval, Yval = __load_CIFAR_batch(ROOT + '/test_batch')
 
-    for a in range(1, 31):
-        X1 = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (a,))
-        xs1.append(X1)
-    Xte = np.concatenate(xs1)
-    del X1, xs1
-    return Xtr, Ytr, Xval, Yval, Xte
+    # for a in range(1, 31):
+    #     X1 = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (a,))
+    #     xs1.append(X1)
+    # Xte = np.concatenate(xs1)
+    # del X1, xs1
+    return Xtr, Ytr, Xval, Yval  # , Xte
 
+
+# only load test data for calculation (otherwise MemError)
+def loadCIFAR10_Test(ROOT, batch_number):
+    Xte = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (batch_number,))
+    return Xte
 
 def get_CIFAR10_data(file_name, num_training=50000, num_validation=10000, num_test=10000):
     """
@@ -266,7 +269,7 @@ def get_CIFAR10_data(file_name, num_training=50000, num_validation=10000, num_te
     """
     # Load the raw CIFAR-10 data
     cifar10_dir = file_name
-    X_train, y_train, X_val, y_val, X_test = __load_CIFAR10(cifar10_dir)
+    X_train, y_train, X_val, y_val = __load_CIFAR10(cifar10_dir)
 
     # Subsample the data
     # print X_train.shape
@@ -274,23 +277,26 @@ def get_CIFAR10_data(file_name, num_training=50000, num_validation=10000, num_te
     mean_image = np.mean(X_train, axis=0)
     X_train -= mean_image
     X_val -= mean_image
-    X_test -= mean_image
+    # X_test -= mean_image
 
     return {
         'X_train': X_train, 'y_train': y_train,
-        'X_val': X_val, 'y_val': y_val,
-        'X_test': X_test
+        'X_val': X_val, 'y_val': y_val
     }
+
+
 # 0 => [1 0 0 0 0 0 0 0 0 0]
 # 1 => [0 1 0 0 0 0 0 0 0 0]
 # ...
 # 9 => [0 0 0 0 0 0 0 0 0 1]
 def label_to_one_hot(labels, num_classes):
     num_batch = labels.shape[0]
-    index_offset = np.arange(num_batch) * num_classes   # each row has num_classes item，so for each row the offset is row_number * num_classes
+    index_offset = np.arange(
+        num_batch) * num_classes  # each row has num_classes item，so for each row the offset is row_number * num_classes
     label_flat_hot = np.zeros((num_batch, num_classes))
     label_flat_hot.flat[index_offset + labels.ravel()] = 1
     return label_flat_hot
+
 
 if __name__ == '__main__':
 
@@ -303,17 +309,16 @@ if __name__ == '__main__':
     train_labels = data['y_train']
     val_data = data['X_val']
     val_label = data['y_val']
-    test_data = data['X_test']
-    test_label = data['y_test']
 
-    print ("train_data length: %d" % len(train_data))
-    print ("val_data length: %d" % len(val_data))
-    print ("test_data length: %d" % len(test_data))
+    print("train_data length: %d" % len(train_data))
+    print("val_data length: %d" % len(val_data))
+    # print("test_data length: %d" % len(test_data))
 
     class_list = []
-    class_list_2 = []
-    class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse", 8: "ship", 9: "truck"}
-    N = test_data.shape[0]
+    # class_list_2 = []
+    class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse",
+                 8: "ship", 9: "truck"}
+    # N = test_data.shape[0]
     # for index in xrange(N):
     #         pre_class_2 = class_dic[test_label[index]]
     #         class_list_2.append(pre_class_2)
@@ -339,42 +344,58 @@ if __name__ == '__main__':
     predict_function = tf.argmax(logits, 1)
     correct_prediction = tf.equal(predict_function, tf.argmax(labels, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    # Create a saver.
+    saver = tf.train.Saver(tf.all_variables())
     session.run(tf.initialize_all_variables())
 
     BATCH_SIZE = 128
+    max_steps = 1000000
+    train_model_dir = '/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py/checkpoint_dir'
+    for step in xrange(max_steps):
+        num_train = train_data.shape[0]
+        batch_mask = np.random.choice(num_train, BATCH_SIZE)
+        train_data_batch = train_data[batch_mask]
+        train_labels_batch = label_to_one_hot(train_labels[batch_mask], label_count)
 
-    for step in xrange(1000000):
-            num_train = train_data.shape[0]
-            batch_mask = np.random.choice(num_train, BATCH_SIZE)
-            train_data_batch = train_data[batch_mask]
-            train_labels_batch = label_to_one_hot(train_labels[batch_mask], label_count)
+        start_time = time.time()
+        train_step.run(feed_dict={images: train_data_batch, labels: train_labels_batch})
+        if step % 100 == 0:
+            duration = time.time() - start_time
+            print('duration:%d s' % duration)
+            train_accuracy = accuracy.eval(feed_dict={images: train_data_batch, labels: train_labels_batch})
+            print("step %d, training accuracy %g" % (step, train_accuracy))
 
-            start_time = time.time()
-            train_step.run(feed_dict={images: train_data_batch, labels: train_labels_batch})
-            if step % 100 == 0:
-                duration = time.time() - start_time
-                print ('duration:%d s' % duration)
-                train_accuracy = accuracy.eval(feed_dict={images: train_data_batch, labels: train_labels_batch})
-                print("step %d, training accuracy %g" % (step, train_accuracy))
+        # Save the model checkpoint periodically.
+        if step % 1000 == 0 or (step + 1) == max_steps:
+            checkpoint_path = os.path.join(train_model_dir, 'model.ckpt')
+            saver.save(session, checkpoint_path, global_step=step)
 
-    print("val accuracy %g" % accuracy.eval(feed_dict={images: val_data, labels: label_to_one_hot(val_label, label_count)}))
+    print("val accuracy %g" % accuracy.eval(
+        feed_dict={images: val_data, labels: label_to_one_hot(val_label, label_count)}))
 
     # using batches is more resource efficient
-    predicted_lables = np.zeros(test_data.shape[0])
-    for i in range(0, test_data.shape[0] // BATCH_SIZE):
-        test_batch = test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]
-        predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_batch})
-
+    # predicted_lables = np.zeros(test_data.shape[0])
+    # for i in range(0, test_data.shape[0] // BATCH_SIZE):
+    #     test_batch = test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]
+    #     predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_batch})
     try:
+        predicted_labels = []
+        for batch_number in range(1, 31):
+            # predicted_labels = []
+            test_batch = loadCIFAR10_Test('/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py', batch_number)
+            print("test_batch length: %d" % len(test_batch))
+            test_label = predict_function.eval(feed_dict={images: test_batch})
+            predicted_labels.append(test_label)
+        N = len(predicted_labels)
         for index in xrange(N):
-            pre_class = class_dic[predicted_lables[index]]
+            pre_class = class_dic[predicted_labels[index]]
             class_list.append(pre_class)
-
-        for index in xrange(N):
-            pre_class_2 = class_dic[test_label[index]]
-            class_list_2.append(pre_class_2)
+        # for index in xrange(N):
+        #     pre_class_2 = class_dic[val_label[index]]
+        #     class_list_2.append(pre_class_2)
+        # save results
+        np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(N) + 1), class_list], delimiter=',', header='id,label', comments='', fmt='%s')
     except:
         pass
-    # save results
-    np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(test_data) + 1), class_list], delimiter=',',
-               header='id,label', comments='', fmt='%s')
+
+
