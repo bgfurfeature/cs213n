@@ -5,7 +5,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import BernoulliNB, MultinomialNB
 from sklearn.svm import SVC, LinearSVC, NuSVC
 
-
 def bag_of_words(words):
     """
     词袋
