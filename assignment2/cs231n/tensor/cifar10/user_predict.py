@@ -39,6 +39,7 @@ import time
 import numpy as np
 import tensorflow as tf
 from tensorflow.models.image.cifar10 import cifar10
+import cPickle as pickle
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -110,6 +111,72 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
         coord.join(threads, stop_grace_period_secs=10)
 
 
+def __load_test_data_batch_with_no_label(filename):
+    """ load single batch of cifar """
+    with open(filename, 'rb') as f:
+        datadict = pickle.load(f)
+        X = datadict['data']
+        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
+        return X
+
+
+# only load test data for calculation (otherwise MemError)
+def loadCIFAR10_Test(ROOT, batch_number):
+    Xte = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (batch_number,))
+    return Xte
+
+
+def predict(saver):
+    """
+    Args:
+    saver: Saver.
+  """
+    with tf.Session() as sess:
+        ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+        if ckpt and ckpt.model_checkpoint_path:
+            # Restores from checkpoint
+            saver.restore(sess, ckpt.model_checkpoint_path)
+            # Assuming model_checkpoint_path looks something like:
+            #   /my-favorite-path/cifar10_train/model.ckpt-0,
+            # extract global_step from it.
+            global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
+        else:
+            print('No checkpoint file found')
+            return
+
+        user_images = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])  # None means whatever size you like
+
+        # x_image = tf.reshape(images, [-1, 32, 32, 3])
+        user_logits = cifar10.inference(user_images)
+
+        # define predict function
+        predict_function = tf.argmax(user_logits, 1)
+        class_list = []
+        class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse",
+                     8: "ship", 9: "truck"}
+
+        BATCH_SIZE = 128
+        try:
+            predicted_labels = []
+            for batch_number in range(1, 31):
+                # predicted_labels = []
+                test_data = loadCIFAR10_Test('/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py', batch_number)
+                test_label = predict_function.eval(feed_dict={user_images: test_data})
+                predicted_labels.append(test_label)
+                # for i in range(0, test_data.shape[0] // BATCH_SIZE):
+                #     test_batch = test_data[i * BATCH_SIZE: (i + 1) * BATCH_SIZE]
+                #     predicted_labels[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(feed_dict={images: test_batch})
+                #     print("test_batch length: %d" % len(test_batch))
+            N = len(predicted_labels)
+            for index in xrange(N):
+                pre_class = class_dic[predicted_labels[index]]
+                class_list.append(pre_class)
+            np.savetxt('cifar10_CNN.csv', np.c_[range(1, len(N) + 1), class_list], delimiter=',', header='id,label',
+                       comments='', fmt='%s')
+        except:
+            pass
+
+
 def evaluate():
     """Eval CIFAR-10 for a number of steps."""
     with tf.Graph().as_default() as g:
@@ -123,9 +190,6 @@ def evaluate():
 
         # Calculate predictions.
         top_k_op = tf.nn.in_top_k(logits, labels, 1)
-
-        # define predict function
-        predict_function = tf.argmax(logits, 1)
 
         # Restore the moving average version of the learned variables for eval.
         variable_averages = tf.train.ExponentialMovingAverage(
@@ -146,11 +210,12 @@ def evaluate():
 
 
 def main(argv=None):  # pylint: disable=unused-argument
-    cifar10.maybe_download_and_extract()
-    if tf.gfile.Exists(FLAGS.eval_dir):
-        tf.gfile.DeleteRecursively(FLAGS.eval_dir)
-    tf.gfile.MakeDirs(FLAGS.eval_dir)
-    evaluate()
+
+    # Restore the moving average version of the learned variables for eval.
+    variable_averages = tf.train.ExponentialMovingAverage(cifar10.MOVING_AVERAGE_DECAY)
+    variables_to_restore = variable_averages.variables_to_restore()
+    saver = tf.train.Saver(variables_to_restore)
+    predict(saver)
 
 
 if __name__ == '__main__':

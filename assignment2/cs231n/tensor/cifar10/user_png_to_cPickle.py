@@ -17,6 +17,8 @@ class Image_process(object):
         self.height = self.weight = 32
         self.channel = 3
         self.batch_size = 10000
+        self.piexls = []
+        self.label = [0]
 
     # get pixels of a image
     def pixels(self):
@@ -28,12 +30,20 @@ class Image_process(object):
             r, g, b = image_object.split()
             image_arr = [np.asanyarray(channel, dtype=np.uint8).reshape([1, self.height * self.weight]) for channel in
                          image_object.split()]
-            # r_arr = np.asanyarray(r, dtype=np.uint8)
-            # g_arr = np.asanyarray(g, dtype=np.uint8)
-            # b_arr = np.asanyarray(b, dtype=np.uint8)
-            self.pixel_array.append(image_arr)
-            if i % 10000 == 0:
-                self.save_as_pickle("test_data_batch_%d" % (index, ))
+            # r_arr = np.asanyarray(r, dtype=np.uint8).reshape([1, self.height * self.weight])
+            # g_arr = np.asanyarray(g, dtype=np.uint8).reshape([1, self.height * self.weight])
+            # b_arr = np.asanyarray(b, dtype=np.uint8).reshape([1, self.height * self.weight])
+            # self.piexls.append(self.label)
+            self.pixel_array.append(self.label[0])
+            for channel in image_arr:
+                for channel_arr in channel:
+                    for item in channel_arr:
+                        self.pixel_array.append(item)
+            # print len(self.pixel_array)
+            if i == self.num_pic:
+                # self.save_as_pickle("test_data_batch_%d" % (index,))
+                print "index:", index
+                self.save_as_bin("test_batch.bin")
                 index += 1
 
     # save to pickle file
@@ -55,6 +65,22 @@ class Image_process(object):
         # f2 = file(path, 'rb')
         # res = pickle.load(f2)
         # f2.close()
+
+    # save as binary
+    def save_as_bin(self, file_name=None):
+        # if file_name is not None:
+        #     path = self.file + str(file_name)
+        # else:
+        #     print 'file_name should not be None!!'
+        #     return
+        # print self.pixel_array
+        record = bytes(bytearray(self.pixel_array))
+        contents = b"".join(record)
+        f = open(file_name, "wb")
+        f.write(contents)
+        f.close()
+        self.pixel_array = []
+        self.pixel_dict = {}
 
 
 if __name__ == '__main__':
