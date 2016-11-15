@@ -42,16 +42,89 @@ import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 from tensorflow.models.image.cifar10 import cifar10
+import  cPickle as pickle
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('train_dir', '/tmp/cifar10_train',
+tf.app.flags.DEFINE_string('train_dir', 'cifar10_train',
                            """Directory where to write event logs """
                            """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 1000000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
+
+
+def __load_CIFAR_batch(filename):
+    """ load single batch of cifar """
+    with open(filename, 'rb') as f:
+        datadict = pickle.load(f)
+        X = datadict['data']
+        Y = datadict['labels']
+        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype(np.float32)
+        Y = np.array(Y)
+        return X, Y
+
+
+def __load_test_data_batch_with_no_label(filename):
+    """ load single batch of cifar """
+    with open(filename, 'rb') as f:
+        datadict = pickle.load(f)
+        X = datadict['data']
+        X = X.reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1).astype(np.float32)
+        return X
+
+def __load_CIFAR10(ROOT):
+    """ load all of cifar """
+    xs = []
+    xs1 = []
+    ys = []
+    for b in range(1, 6):
+        # f = os.path.join(ROOT, 'data_batch_%d' % (b,))
+        X, Y = __load_CIFAR_batch(ROOT + "/" + 'data_batch_%d' % (b,))
+        xs.append(X)
+        ys.append(Y)
+    Xtr = np.concatenate(xs)
+    Ytr = np.concatenate(ys)
+    del X, Y, xs, ys
+    Xval, Yval = __load_CIFAR_batch(ROOT + '/test_batch')
+
+    # for a in range(1, 31):
+    #     X1 = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (a,))
+    #     xs1.append(X1)
+    # Xte = np.concatenate(xs1)
+    # del X1, xs1
+    return Xtr, Ytr, Xval, Yval  # , Xte
+
+
+# only load test data for calculation (otherwise MemError)
+def loadCIFAR10_Test(ROOT, batch_number):
+    Xte = __load_test_data_batch_with_no_label(ROOT + '/test_data_batch_%d' % (batch_number,))
+    return Xte
+
+
+def get_CIFAR10_data(file_name, num_training=50000, num_validation=10000, num_test=10000):
+    """
+    Load the CIFAR-10 dataset from disk and perform preprocessing to prepare
+    it for classifiers. These are the same steps as we used for the SVM, but
+    condensed to a single function.
+    """
+    # Load the raw CIFAR-10 data
+    cifar10_dir = file_name
+    X_train, y_train, X_val, y_val = __load_CIFAR10(cifar10_dir)
+
+    # Subsample the data
+    # print X_train.shape
+    # Normalize the data: subtract the mean image, same mean pls
+    mean_image = np.mean(X_train, axis=0)
+    # X_train -= mean_image
+    # X_val -= mean_image
+
+    return {
+        'X_train': X_train, 'y_train': y_train,
+        'X_val': X_val, 'y_val': y_val,
+        'mean': mean_image
+    }
 
 
 def train():
@@ -120,7 +193,7 @@ def train():
 
 
 def main(argv=None):  # pylint: disable=unused-argument
-    cifar10.maybe_download_and_extract()
+    # cifar10.maybe_download_and_extract()
     if tf.gfile.Exists(FLAGS.train_dir):
         tf.gfile.DeleteRecursively(FLAGS.train_dir)
     tf.gfile.MakeDirs(FLAGS.train_dir)
