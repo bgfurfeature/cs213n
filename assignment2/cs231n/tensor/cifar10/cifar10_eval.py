@@ -92,6 +92,7 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
             step = 0
             while step < num_iter and not coord.should_stop():
                 predictions = sess.run([top_k_op])
+                print ("predictions:", predictions)
                 true_count += np.sum(predictions)
                 step += 1
 
