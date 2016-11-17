@@ -3,10 +3,19 @@ from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 print(len(mnist.test.images))
+
+
+# how to display an image
+def display(image, height, weight):
+    one_image = image.reshape(height, weight)
+    plt.axis('off')
+    plt.imshow(one_image, cmap=cm.binary)
 
 
 # 0 => [1 0 0 0 0 0 0 0 0 0]
@@ -16,7 +25,7 @@ print(len(mnist.test.images))
 def label_to_one_hot(labels, num_classes):
     num_batch = labels.shape[0]
     index_offset = np.arange(num_batch) * num_classes  # each row has num_classes item，so for each row the offset is row_number * num_classes
-    label_flat_hot = np.zeros(num_batch, num_classes)
+    label_flat_hot = np.zeros((num_batch, num_classes))
     label_flat_hot.flat[index_offset + labels.ravel()] = 1
     return label_flat_hot
 
@@ -181,7 +190,7 @@ for i in range(20001):
     batch_mask = np.random.choice(num_train, 50)
     X_batch = train_data[batch_mask]
     X_batch_normal = np.multiply(X_batch, 1.0 / 255.0)
-    y_batch = label_to_one_hot(train_label[batch_mask],label_count)
+    y_batch = label_to_one_hot(train_label[batch_mask], label_count)
     # batch = mnist.train.next_batch(50)
     if i % 100 == 0:
         train_accuracy = accuracy.eval(feed_dict={x: X_batch_normal, y_: y_batch, keep_prob: 1.0})
@@ -204,5 +213,5 @@ for i in range(0, test_data.shape[0] // BATCH_SIZE):
     predicted_lables[i * BATCH_SIZE: (i + 1) * BATCH_SIZE] = predict_function.eval(
         feed_dict={x: test_batch, keep_prob: 1.0})
 # save results
-np.savetxt('LeNet_cnn_2.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
-           header='ImageId,Label', comments='', fmt='%s')
+np.savetxt('LeNet_cnn.csv', np.c_[range(1, len(test_data) + 1), predicted_lables], delimiter=',',
+           header='ImageId,Label', comments='', fmt='%d')
