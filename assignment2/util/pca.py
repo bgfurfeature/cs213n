@@ -13,6 +13,7 @@ class pca(object):
     """
         PCA implementing
     """
+
     def pca(self, dataMatrix, top_n_feature=9999999):
         meanVals = mean(dataMatrix, axis=0)
         meanRemoved = dataMatrix - meanVals

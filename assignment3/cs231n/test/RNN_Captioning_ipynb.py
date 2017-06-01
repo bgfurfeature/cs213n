@@ -32,10 +32,10 @@ data = load_coco_data(pca_features=True)
 
 # Print out all the keys and values from the data dictionary
 for k, v in data.iteritems():
-  if type(v) == np.ndarray:
-    print k, type(v), v.shape, v.dtype
-  else:
-    print k, type(v), len(v)
+    if type(v) == np.ndarray:
+        print k, type(v), v.shape, v.dtype
+    else:
+        print k, type(v), len(v)
 
 # Look at the data
 # Sample a minibatch and show the images and captions
@@ -46,15 +46,15 @@ captions, features, urls = sample_coco_minibatch(data, batch_size=batch_size)
 print 'idx_to_word'
 print data['idx_to_word']
 for i, (caption, url) in enumerate(zip(captions, urls)):
-  # plt.imshow(image_from_url(url))
-  # plt.axis('off')
-  print "caption"
-  print caption
-  caption_str = decode_captions(caption, data['idx_to_word'])
-  print "caption_str"
-  print caption_str
-  # plt.title(caption_str)
-  # plt.show()
+    # plt.imshow(image_from_url(url))
+    # plt.axis('off')
+    print "caption"
+    print caption
+    caption_str = decode_captions(caption, data['idx_to_word'])
+    print "caption_str"
+    print caption_str
+    # plt.title(caption_str)
+    # plt.show()
 #############################################################################
 # Recurrent Neural Networks
 # Vanilla RNN: step forward ： a single timestep of a vanilla RNN

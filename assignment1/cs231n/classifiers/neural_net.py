@@ -96,9 +96,9 @@ class TwoLayerNet(object):
         shift_scores = scores - np.max(scores, axis=1) \
             .reshape(-1, 1)  # matrix scores of shape (N, C),axis = 1,rows priority
         softmax_output = np.exp(shift_scores) / np.sum(np.exp(shift_scores), axis=1).reshape(-1, 1)
-        loss = -np.sum(np.log(softmax_output[range(N), list(y)]))  # 矩阵中的【i，j】i行j列，计算实际类别的loss
-        loss /= N   # 平均一下
-        loss += reg * 0.5 * (np.sum(W1 * W1) + np.sum(W2 * W2))   # 惩罚项
+        loss = -np.sum(np.log(softmax_output[range(N), list(y)]))  # sum
+        loss /= N   # divid number
+        loss += reg * 0.5 * (np.sum(W1 * W1) + np.sum(W2 * W2))   # normalize
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################

@@ -1,8 +1,9 @@
 __author__ = 'CHAOJIANG'
 import numpy as np
+
 x = np.array([[2, 0, 1, 0, 1], [0, 1, 0, 1, 0], [0, 1, 1, 0, 1], [1, 0, 0, 1, 0]])
-print  "x"
-print  x
+print "x"
+print x
 
 # print np.max(x, axis = 1)
 # shift_scores = x - np.max(x, axis = 1).reshape(-1, 1)
@@ -41,7 +42,3 @@ print  x
 # trw = 2*np.dot(x,np.transpose(x))
 # print "trw"
 # print x_shape + x_tr - trw
-
-
-
-

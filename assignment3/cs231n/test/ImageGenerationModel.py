@@ -1,4 +1,5 @@
 from cs231n.test.ImageGeneration_ipynb import *
+
 filename = 'kitten.jpg'
 max_size = 256
 img = read_image(filename, max_size)

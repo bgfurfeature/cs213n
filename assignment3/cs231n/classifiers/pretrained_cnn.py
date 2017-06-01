@@ -5,7 +5,8 @@ from cs231n.fast_layers import *
 from cs231n.layer_utils import *
 
 
-# 9 convolutional layers (with spatial batch normalization) and 1 fully-connected hidden layer (with batch normalization).
+# 9 convolutional layers (with spatial batch normalization)
+# and 1 fully-connected hidden layer (with batch normalization).
 class PretrainedCNN(object):
     def __init__(self, dtype=np.float32, num_classes=100, input_size=64, h5_file=None):
         self.dtype = dtype
@@ -36,7 +37,8 @@ class PretrainedCNN(object):
         self.params = {}
         for i, (f, next_dim) in enumerate(zip(self.filter_sizes, self.num_filters)):
             fan_in = f * f * prev_dim
-            self.params['W%d' % (i + 1)] = np.sqrt(2.0 / fan_in) * np.random.randn(next_dim, prev_dim, f, f)
+            self.params['W%d' % (i + 1)] = np.sqrt(2.0 / fan_in) * np.random.randn(next_dim,
+                                                                                   prev_dim, f, f)
             self.params['b%d' % (i + 1)] = np.zeros(next_dim)
             self.params['gamma%d' % (i + 1)] = np.ones(next_dim)
             self.params['beta%d' % (i + 1)] = np.zeros(next_dim)
@@ -51,7 +53,8 @@ class PretrainedCNN(object):
         self.params['gamma%d' % (i + 2)] = np.ones(hidden_dim)
         self.params['beta%d' % (i + 2)] = np.zeros(hidden_dim)
         self.bn_params.append({'mode': 'train'})
-        self.params['W%d' % (i + 3)] = np.sqrt(2.0 / hidden_dim) * np.random.randn(hidden_dim, num_classes)
+        self.params['W%d' % (i + 3)] = np.sqrt(2.0 / hidden_dim) * np.random.randn(hidden_dim,
+                                                                                   num_classes)
         self.params['b%d' % (i + 3)] = np.zeros(num_classes)
 
         for k, v in self.params.iteritems():
@@ -146,7 +149,8 @@ class PretrainedCNN(object):
                 bn_param = self.bn_params[i]
                 bn_param['mode'] = mode
 
-                next_a, cache = conv_bn_relu_forward(prev_a, w, b, gamma, beta, conv_param, bn_param)
+                next_a, cache = conv_bn_relu_forward(prev_a, w, b, gamma, beta, conv_param,
+                                                     bn_param)
             elif i == len(self.conv_params):
                 # This is the fully-connected hidden layer
                 w, b = self.params['W%d' % i1], self.params['b%d' % i1]

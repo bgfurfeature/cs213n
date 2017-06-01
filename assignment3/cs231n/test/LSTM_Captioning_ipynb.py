@@ -297,15 +297,15 @@ sound_file = './sound/finish.mp3'
 Audio(url=sound_file, autoplay=True)
 
 for split in ['train', 'val']:
-  minibatch = sample_coco_minibatch(small_data2, split=split, batch_size=2)
-  gt_captions, features, urls = minibatch
-  gt_captions = decode_captions(gt_captions, data['idx_to_word'])
+    minibatch = sample_coco_minibatch(small_data2, split=split, batch_size=2)
+    gt_captions, features, urls = minibatch
+    gt_captions = decode_captions(gt_captions, data['idx_to_word'])
 
-  sample_captions = good_model.sample(features)
-  sample_captions = decode_captions(sample_captions, data['idx_to_word'])
+    sample_captions = good_model.sample(features)
+    sample_captions = decode_captions(sample_captions, data['idx_to_word'])
 
-  for gt_caption, sample_caption, url in zip(gt_captions, sample_captions, urls):
-    # plt.imshow(image_from_url(url))
-    plt.title('%s\n%s\nGT:%s' % (split, sample_caption, gt_caption))
-    plt.axis('off')
-    plt.show()
+    for gt_caption, sample_caption, url in zip(gt_captions, sample_captions, urls):
+        # plt.imshow(image_from_url(url))
+        plt.title('%s\n%s\nGT:%s' % (split, sample_caption, gt_caption))
+        plt.axis('off')
+        plt.show()
