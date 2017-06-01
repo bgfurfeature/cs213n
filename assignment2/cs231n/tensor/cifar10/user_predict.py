@@ -126,12 +126,27 @@ def loadCIFAR10_Test(ROOT, batch_number):
     return Xte
 
 
-def predict(saver):
+def predict():
     """
-    Args:
-    saver: Saver.
   """
+    with tf.Graph().as_default() as g:
+
+        user_images = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])  # None means whatever size you like
+
+        # x_image = tf.reshape(images, [-1, 32, 32, 3])
+        user_logits = cifar10.inference(user_images)
+
+        # define predict function
+        predict_function = tf.argmax(user_logits, 1)
+
+        variable_averages = tf.train.ExponentialMovingAverage(cifar10.MOVING_AVERAGE_DECAY)
+
+        variables_to_restore = variable_averages.variables_to_restore()
+
+        saver = tf.train.Saver(variables_to_restore)
+
     with tf.Session() as sess:
+
         ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
             # Restores from checkpoint
@@ -144,13 +159,6 @@ def predict(saver):
             print('No checkpoint file found')
             return
 
-        user_images = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])  # None means whatever size you like
-
-        # x_image = tf.reshape(images, [-1, 32, 32, 3])
-        user_logits = cifar10.inference(user_images)
-
-        # define predict function
-        predict_function = tf.argmax(user_logits, 1)
         class_list = []
         class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse",
                      8: "ship", 9: "truck"}
@@ -160,7 +168,8 @@ def predict(saver):
             predicted_labels = []
             for batch_number in range(1, 31):
                 # predicted_labels = []
-                test_data = loadCIFAR10_Test('/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py', batch_number)
+                test_data = loadCIFAR10_Test('/mnt/hgfs/cs231n/cs231n/assignment2/cs231n/datasets/cifar-10-batches-py',
+                                             batch_number)
                 test_label = predict_function.eval(feed_dict={user_images: test_data})
                 predicted_labels.append(test_label)
                 # for i in range(0, test_data.shape[0] // BATCH_SIZE):
@@ -191,32 +200,24 @@ def evaluate():
         # Calculate predictions.
         top_k_op = tf.nn.in_top_k(logits, labels, 1)
 
-        # Restore the moving average version of the learned variables for eval.
-        variable_averages = tf.train.ExponentialMovingAverage(
-            cifar10.MOVING_AVERAGE_DECAY)
+        # define predict function
+        predict_function = tf.argmax(logits, 1)
+
+        variable_averages = tf.train.ExponentialMovingAverage(cifar10.MOVING_AVERAGE_DECAY)
         variables_to_restore = variable_averages.variables_to_restore()
         saver = tf.train.Saver(variables_to_restore)
-
         # Build the summary operation based on the TF collection of Summaries.
         summary_op = tf.merge_all_summaries()
-
         summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir, g)
 
-        while True:
-            eval_once(saver, summary_writer, top_k_op, summary_op)
-            if FLAGS.run_once:
-                break
-            time.sleep(FLAGS.eval_interval_secs)
+        predict()
 
 
 def main(argv=None):  # pylint: disable=unused-argument
 
     # Restore the moving average version of the learned variables for eval.
-    variable_averages = tf.train.ExponentialMovingAverage(cifar10.MOVING_AVERAGE_DECAY)
-    variables_to_restore = variable_averages.variables_to_restore()
-    saver = tf.train.Saver(variables_to_restore)
-    predict(saver)
+    predict()
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    main()

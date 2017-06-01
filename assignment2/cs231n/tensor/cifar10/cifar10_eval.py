@@ -50,13 +50,13 @@ tf.app.flags.DEFINE_string('checkpoint_dir', 'cifar10_train',
                            """Directory where to read model checkpoints.""")
 tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 5,
                             """How often to run the eval.""")
-tf.app.flags.DEFINE_integer('num_examples', 300000,
+tf.app.flags.DEFINE_integer('num_examples', 10000,
                             """Number of examples to run.""")
 tf.app.flags.DEFINE_boolean('run_once', False,
                             """Whether to run eval only once.""")
 
 
-def eval_once(saver, summary_writer, top_k_op, summary_op):
+def eval_once(saver, summary_writer, top_k_op, predict_function, summary_op):
     """Run Eval once.
 
   Args:
@@ -73,10 +73,15 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
             # Assuming model_checkpoint_path looks something like:
             #   /my-favorite-path/cifar10_train/model.ckpt-0,
             # extract global_step from it.
+            print("ckpt.model_checkpoint_path:", ckpt.model_checkpoint_path)
             global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
         else:
             print('No checkpoint file found')
             return
+
+        predicted_lable = []
+        class_dic = {0: "airplane", 1: "automobile", 2: "bird", 3: "cat", 4: "deer", 5: "dog", 6: "frog", 7: "horse",
+                     8: "ship", 9: "truck"}
 
         # Start the queue runners.
         coord = tf.train.Coordinator()
@@ -92,10 +97,18 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
             step = 0
             while step < num_iter and not coord.should_stop():
                 predictions = sess.run([top_k_op])
-                print ("predictions:", predictions)
+                pred_result = sess.run([predict_function])
+                # print("pred_result length: ", len(pred_result[0]))  # 128
+                for item in pred_result[0]:
+                    predicted_lable.append(class_dic[item])
+                # print (predicted_lable)
                 true_count += np.sum(predictions)
                 step += 1
 
+            N = len(predicted_lable)
+            print ("num_examples:", N)
+            np.savetxt('cifar10_CNN.csv', np.c_[range(1, N + 1), predicted_lable], delimiter=',', header='id,label',
+                       comments='', fmt='%s')
             # Compute precision @ 1.
             precision = true_count / total_sample_count
             print('%s: precision @ 1 = %.3f' % (datetime.now(), precision))
@@ -104,6 +117,7 @@ def eval_once(saver, summary_writer, top_k_op, summary_op):
             summary.ParseFromString(sess.run(summary_op))
             summary.value.add(tag='Precision @ 1', simple_value=precision)
             summary_writer.add_summary(summary, global_step)
+            exit(-1)
         except Exception as e:  # pylint: disable=broad-except
             coord.request_stop(e)
 
@@ -140,14 +154,14 @@ def evaluate():
         summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir, g)
 
         while True:
-            eval_once(saver, summary_writer, top_k_op, summary_op)
+            eval_once(saver, summary_writer, top_k_op, predict_function, summary_op)
             if FLAGS.run_once:
                 break
             time.sleep(FLAGS.eval_interval_secs)
 
 
 def main(argv=None):  # pylint: disable=unused-argument
-    cifar10.maybe_download_and_extract()
+    # cifar10.maybe_download_and_extract()
     if tf.gfile.Exists(FLAGS.eval_dir):
         tf.gfile.DeleteRecursively(FLAGS.eval_dir)
     tf.gfile.MakeDirs(FLAGS.eval_dir)
