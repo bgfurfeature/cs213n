@@ -153,6 +153,7 @@ class KNearestNeighbor(object):
             # A list of length k storing the labels of the k nearest neighbors to
             # the ith test point.
             closest_y = []
+
             #########################################################################
             # TODO:                                                                 #
             # Use the distance matrix to find the k nearest neighbors of the ith    #
@@ -168,13 +169,14 @@ class KNearestNeighbor(object):
             # Store this label in y_pred[i]. Break ties by choosing the smaller     #
             # label.                                                                #
             #########################################################################
-            closest_labels = np.array(self.y_train[closest_y]).tolist()  # find the labels of k-rows
+            # find the labels of k-rows
+            closest_labels = np.array(self.y_train[closest_y]).tolist()
 
             most_common_label = closest_labels[0]  # find most common label
 
             for label in closest_labels:
-                num = closest_labels.count(label)
-                if num < closest_labels.count(most_common_label):
+                num = closest_labels.count(label)  # count by label in list
+                if num < closest_labels.count(most_common_label):  # record max counter label
                     most_common_label = label
             y_pred[i] = most_common_label[0]
             #########################################################################
