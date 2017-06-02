@@ -82,7 +82,7 @@ def softmax_loss_vectorized(W, X, y, reg):
     #############################################################################
     score = W.dot(X)
     # On rajoute une constant pr ls overflow
-    score += - np.max(score, axis=0)
+    score += - np.max(score, axis=0)  # mine max item
     exp_score = np.exp(score)  # matric exponientiel score
     sum_exp_score_col = np.sum(exp_score, axis=0)  # sum des expo score pr chaque column
 

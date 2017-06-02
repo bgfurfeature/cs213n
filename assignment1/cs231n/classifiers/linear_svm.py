@@ -32,7 +32,7 @@ def svm_loss_naive(W, X, y, reg):
         count = 0
         for j in xrange(num_classes):
             if j == y[i]:
-                dW.T[y[i]] += - 1 * (- count * X[y[i]])
+                dW.T[y[i]] += - 1 * (- count * X[y[i]])   # a bit confuse
                 continue
             margin = scores[j] - correct_class_score + 1  # note delta = 1
             if margin > 0:
@@ -80,7 +80,7 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # TODO:                                                                     #
     # Implement a vectorized version of the structured SVM loss, storing the    #
-    # result in loss.  max(0, y - y_ + 1)
+    # result in loss.  margins = max(0, y - y_ + 1)
     #############################################################################
     scores = X.dot(W)
     correct_class_scores = scores[range(num_train), list(y)].reshape(-1, 1)
